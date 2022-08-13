@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+<script>
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+  })
+  function register_successful() {
+    if (!sessionStorage.getItem("registerflash")) {
+      Toast.fire({
+        icon: 'success',
+        title: 'Registered Successfully'
+      });
+      sessionStorage.setItem("registerflash", "true");
+    }
+  }
+  function login_successful() {
+    if (!sessionStorage.getItem("loginflash")) {
+      Toast.fire({
+        icon: 'success',
+        title: 'Logged in Successfully'
+      });
+      sessionStorage.setItem("loginflash", "true");
+    }
+  }
+  window.addEventListener("load", () => {
+    document.querySelector("#clear").addEventListener("click", e => {
+      console.log("here");
+      sessionStorage.removeItem('loginflash');
+      sessionStorage.removeItem('registerflash');
+    });
+  });
+</script>
+<br>
+Hello {{ name }}, You are logged in.
+<br>
+<a href="/auth/logout">
+    <button class="button" style="vertical-align:middle; width:auto;">
+        <span>Logout</span>
+    </button>
+</a>

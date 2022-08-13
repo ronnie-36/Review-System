@@ -1,0 +1,37 @@
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
+    function not_logged_in() {
+        setTimeout(Toast.fire({
+            icon: 'error',
+            title: 'NOT AUTHORIZED.\n Log in Required.'
+        }), 3000);
+    }
+    function register_fail() {
+        var message = '';
+        {{#if error}}
+        message = '{{error}}';
+        {{/if}}
+                //console.log(message);
+                setTimeout(Toast.fire({
+                    icon: 'error',
+                    title: 'FAILED.\n' + message
+                }), 5000);
+
+            }
+</script>
+
+<a href="/auth/google">
+    <button class="button" style="vertical-align:middle; width:auto;">
+        <span>Dive In</span>
+    </button>
+</a>
