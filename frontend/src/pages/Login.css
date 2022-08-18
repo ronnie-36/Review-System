@@ -1,0 +1,21 @@
+.LoginPage {
+    height: 100vh;
+    background-color: blueviolet;
+}
+
+
+.SignUpBtn{
+    background-color:#bcc0c4;
+    border: none;
+    color: black;
+}
+
+.SignUpBtn:hover{
+    background-color: #bcc0c4;
+    color: rgb(85, 107, 107);
+}
+
+.MobileInput:focus{
+    box-shadow: none;
+}
+
