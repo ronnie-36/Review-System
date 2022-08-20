@@ -1,0 +1,7 @@
+.navbar__homepage {
+    display: flex;
+    align-items: center;
+    font-size: larger;
+    padding: 20px;
+    font-weight: 600;
+}

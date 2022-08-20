@@ -1,0 +1,11 @@
+.footer__div {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    min-height: auto;
+    background-color: rgb(62, 205, 218);
+}
+
+.footer_social {
+    transform: scale(2.5);
+}
