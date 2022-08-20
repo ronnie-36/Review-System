@@ -1,9 +1,10 @@
 import React from "react";
 import StarRatings from "react-star-ratings";
-import "./css/OrgView.css";
-
 import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
+
+import "./css/OrgView.css";
+import Review from "../components/Review";
 
 const org = {
   image: "/logo192.png",
@@ -12,6 +13,7 @@ const org = {
   phone: "+919010202398",
   website: "https://www.google.com",
   email: "sample@gmail.com",
+  reviews: [],
 };
 
 function OrgView() {
@@ -22,7 +24,7 @@ function OrgView() {
           style={{ height: "10rem" }}
           className="ms-5 w-100 d-flex container-fluid org-dets align-items-center"
         >
-          <img src={org.image} className="h-100" />
+          <img src={org.image} alt="Organization Logo" className="h-100" />
           <div className="ms-5">
             <div className="fs-1 fw-bold">Organization Name</div>
             <div className="d-flex align-items-center">
@@ -51,6 +53,7 @@ function OrgView() {
               <GoGlobe />
               <a
                 target="_blank"
+                rel="noreferrer"
                 style={{ color: "rgb(33, 37, 41)" }}
                 href={`${org.website}`}
               >
@@ -62,6 +65,12 @@ function OrgView() {
               {org.email}
             </div>
           </div>
+        </div>
+      </div>
+      <div className="d-flex flex-column align-items-center">
+        <div className="fs-2">Reviews</div>
+        <div className="reviews w-100 d-flex flex-column align-items-center">
+          <Review />
         </div>
       </div>
     </div>

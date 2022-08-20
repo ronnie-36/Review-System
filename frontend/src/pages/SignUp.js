@@ -109,7 +109,7 @@ function SignUp() {
           )}
 
           {OTPSent && <Input className="mt-3" placeholder="Enter Mobile OTP" />}
-          {OTPSent && user.email != "" && (
+          {OTPSent && user.email !== "" && (
             <Input className="mt-3" placeholder="Enter Email OTP" />
           )}
           {OTPSent && (
