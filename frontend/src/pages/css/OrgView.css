@@ -1,3 +1,15 @@
 .OrgView{
     background-color: #99f3f3;
 }
+
+.selected{
+    border-bottom: 0.01rem solid red;
+}
+
+.section{
+    width: 33%
+}
+
+.newReviewSection{
+    background-color: #f2e8de78;;
+}

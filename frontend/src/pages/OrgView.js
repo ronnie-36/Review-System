@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import StarRatings from "react-star-ratings";
 import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
 
 import "./css/OrgView.css";
 import Review from "../components/Review";
+import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 
 const org = {
   image: "/logo192.png",
@@ -81,6 +82,18 @@ const org = {
 };
 
 function OrgView() {
+  const [addSection, setAddSection] = useState(false);
+
+  const [newReview, setNewReview] = useState({ text: "" });
+
+  const [error, setError] = useState(false);
+
+  const submitReview = () => {
+    if (newReview.text.length > 20) {
+      setError(true);
+    }
+  };
+
   return (
     <div className="min-vh-100">
       <div className="d-flex OrgView p-3">
@@ -132,11 +145,54 @@ function OrgView() {
         </div>
       </div>
       <div className="d-flex flex-column align-items-center">
-        <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
-          {org.reviews.map((value) => {
-            return <Review key={value.id} review={value} />;
-          })}
+        <div className=" mt-3 d-flex w-75">
+          <div
+            role="button"
+            className={`section p-2 ${addSection ? "" : "selected"}`}
+            onClick={() => setAddSection(false)}
+          >
+            Reviews
+          </div>
+          <div
+            role="button"
+            className={`section p-2 ${!addSection ? "" : "selected"}`}
+            onClick={() => setAddSection(true)}
+          >
+            Add Review
+          </div>
         </div>
+        {!addSection ? (
+          <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
+            {org.reviews.map((value) => {
+              return <Review key={value.id} review={value} />;
+            })}
+          </div>
+        ) : (
+          <div className="w-75 pt-3">
+            <Form className="newReviewSection p-3">
+              <FormGroup>
+                <Label for="newReviewText">{`Review (Maximum 200 characters)`}</Label>
+                <Input
+                  id="newReviewText"
+                  value={newReview.text}
+                  onChange={(e) => {
+                    setError(false);
+                    setNewReview((prevReview) => {
+                      return { ...prevReview, text: e.target.value };
+                    });
+                  }}
+                  type="textarea"
+                />
+                <p className="text-danger">
+                  {error ? "Review cannot be more than 200 characters" : ""}
+                </p>
+              </FormGroup>
+              <Button onClick={() => submitReview()} color="primary">
+                Submit
+              </Button>
+            </Form>
+          </div>
+        )}
       </div>
     </div>
   );
