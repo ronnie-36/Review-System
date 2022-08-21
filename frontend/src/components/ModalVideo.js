@@ -11,11 +11,15 @@ function ModalVideo({ video }) {
         style={{ height: "4rem", width: "4rem" }}
         onClick={() => setModal((modal) => !modal)}
       >
-        <source src={video.url} type="video/mp4" />
+        <source src={video.url} />
       </video>
-      <Modal isOpen={modal} toggle={() => setModal((prevModal) => !prevModal)}>
+      <Modal
+        centered
+        isOpen={modal}
+        toggle={() => setModal((prevModal) => !prevModal)}
+      >
         <video key={video.id} controls>
-          <source src={video.url} type="video/mp4" />
+          <source src={video.url} />
         </video>
       </Modal>
     </>

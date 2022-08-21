@@ -13,7 +13,11 @@ function ModalImage({ image }) {
         key={image.id}
         onClick={() => setModal(true)}
       />
-      <Modal isOpen={modal} toggle={() => setModal((prevModal) => !prevModal)}>
+      <Modal
+        centered
+        isOpen={modal}
+        toggle={() => setModal((prevModal) => !prevModal)}
+      >
         <img
           className="w-100"
           alt="reviewImage"

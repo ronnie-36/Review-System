@@ -2,37 +2,12 @@ import React from "react";
 import StarRatings from "react-star-ratings";
 import ModalImage from "./ModalImage";
 import ModalVideo from "./ModalVideo";
+import "./css/Review.css";
 
-const review = {
-  author: "user 1.2.3",
-  text: "text",
-  rating: 2,
-  videos: [
-    {
-      url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      id: 1,
-    },
-    {
-      url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      id: 1,
-    },
-  ],
-  images: [
-    {
-      url: "https://picsum.photos/500/300",
-      id: 1,
-    },
-    {
-      url: "https://picsum.photos/500/300",
-      id: 2,
-    },
-  ],
-};
-
-function Review() {
+function Review({ review }) {
   //console.log(review);
   return (
-    <div className="review w-50">
+    <div className="review p-5">
       <div className="fw-bold">{review.author}</div>
       <StarRatings
         rating={review.rating}
@@ -49,6 +24,17 @@ function Review() {
       <div className="reviewVideos d-flex flex-wrap">
         {review.videos.map((value) => {
           return <ModalVideo key={value.id} video={value} />;
+        })}
+      </div>
+      <div className="reviewAudios d-flex flex-wrap">
+        {review.audios.map((value) => {
+          return (
+            <div key={value.id} className="mw-100 p-1">
+              <audio className="mw-100" controls>
+                <source src={value.url} />
+              </audio>
+            </div>
+          );
         })}
       </div>
     </div>

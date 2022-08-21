@@ -13,7 +13,71 @@ const org = {
   phone: "+919010202398",
   website: "https://www.google.com",
   email: "sample@gmail.com",
-  reviews: [],
+  reviews: [
+    {
+      id: 1,
+      author: "user 1.2.3",
+      text: "text",
+      rating: 2,
+      videos: [
+        {
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          id: 1,
+        },
+        {
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          id: 2,
+        },
+      ],
+      images: [
+        {
+          url: "https://picsum.photos/500/300",
+          id: 1,
+        },
+        {
+          url: "https://picsum.photos/400/300",
+          id: 2,
+        },
+      ],
+      audios: [
+        {
+          url: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
+          id: 1,
+        },
+        {
+          url: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
+          id: 2,
+        },
+      ],
+    },
+    {
+      id: 2,
+      author: "someone not user",
+      text: "I enjoyed the services a lot",
+      rating: 4,
+      videos: [
+        {
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          id: 1,
+        },
+        {
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          id: 2,
+        },
+      ],
+      images: [
+        {
+          url: "https://picsum.photos/300/300",
+          id: 1,
+        },
+        {
+          url: "https://picsum.photos/700/300",
+          id: 2,
+        },
+      ],
+      audios: [],
+    },
+  ],
 };
 
 function OrgView() {
@@ -21,18 +85,18 @@ function OrgView() {
     <div className="min-vh-100">
       <div className="d-flex OrgView p-3">
         <div
-          style={{ height: "10rem" }}
-          className="ms-5 w-100 d-flex container-fluid org-dets align-items-center"
+          style={{ minHeight: "10rem" }}
+          className="w-100 flex-wrap d-flex container-fluid org-dets align-items-center"
         >
-          <img src={org.image} alt="Organization Logo" className="h-100" />
-          <div className="ms-5">
+          <img src={org.image} alt="Organization Logo" className="mh-100" />
+          <div className="">
             <div className="fs-1 fw-bold">Organization Name</div>
             <div className="d-flex align-items-center">
               <StarRatings
                 rating={org.avgRating}
                 numberOfStars={5}
                 starRatedColor="rgb(253,204,13)"
-                starDimension="2rem"
+                starDimension="1rem"
               />
               <div className="d-flex ms-2 mt-3 align-items-end">
                 <p className="fs-3 fst-italic ">{org.avgRating}</p>
@@ -40,7 +104,7 @@ function OrgView() {
               </div>
             </div>
           </div>
-          <div className="d-flex flex-column ms-5">
+          <div className="d-flex flex-column">
             <div>
               <GoLocation />
               {org.address}
@@ -68,9 +132,10 @@ function OrgView() {
         </div>
       </div>
       <div className="d-flex flex-column align-items-center">
-        <div className="fs-2">Reviews</div>
-        <div className="reviews w-100 d-flex flex-column align-items-center">
-          <Review />
+        <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
+          {org.reviews.map((value) => {
+            return <Review key={value.id} review={value} />;
+          })}
         </div>
       </div>
     </div>
