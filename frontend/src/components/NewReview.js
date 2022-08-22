@@ -88,7 +88,9 @@ function NewReview() {
     <div className="w-75 pt-3">
       <Form className="newReviewSection p-3">
         <FormGroup className="d-flex flex-column">
-          <Label for="rating">Rating</Label>
+          <Label for="rating" className="fw-bold">
+            Rating
+          </Label>
           <StarRatings
             rating={newReview.rating}
             starRatedColor="rgb(253,204,13)"
@@ -103,7 +105,10 @@ function NewReview() {
           />
         </FormGroup>
         <FormGroup>
-          <Label for="newReviewText">{`Review (Maximum 200 characters)`}</Label>
+          <Label
+            className="fw-bold"
+            for="newReviewText"
+          >{`Review (Maximum 200 characters)`}</Label>
           <Input
             id="newReviewText"
             value={newReview.text}
@@ -120,7 +125,9 @@ function NewReview() {
           </p>
         </FormGroup>
         <FormGroup>
-          <Label for="dropzone">Add Photos, Videos or Audio</Label>
+          <Label className="fw-bold" for="dropzone">
+            Add Photos, Videos or Audio
+          </Label>
           <Dropzone
             id="dropzone"
             onChangeStatus={handleChangeStatus}

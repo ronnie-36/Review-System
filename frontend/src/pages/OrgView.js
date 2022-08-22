@@ -138,14 +138,14 @@ function OrgView() {
         <div className=" mt-3 d-flex w-75">
           <div
             role="button"
-            className={`section p-2 ${addSection ? "" : "selected"}`}
+            className={`fw-bold section p-2 ${addSection ? "" : "selected"}`}
             onClick={() => setAddSection(false)}
           >
             Reviews
           </div>
           <div
             role="button"
-            className={`section p-2 ${!addSection ? "" : "selected"}`}
+            className={`fw-bold section p-2 ${!addSection ? "" : "selected"}`}
             onClick={() => setAddSection(true)}
           >
             Add Review

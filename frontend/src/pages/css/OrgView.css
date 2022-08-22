@@ -13,3 +13,13 @@
 .newReviewSection{
     background-color: #f2e8de78;;
 }
+
+.org-dets{
+    justify-content: space-evenly;
+}
+
+@media screen and (max-width:700px) {
+        .org-dets{
+            justify-content: flex-start;
+        }
+}
