@@ -5,7 +5,7 @@ import { BsTelephoneFill } from "react-icons/bs";
 
 import "./css/OrgView.css";
 import Review from "../components/Review";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import NewReview from "../components/NewReview";
 
 const org = {
   image: "/logo192.png",
@@ -72,7 +72,7 @@ const org = {
           id: 1,
         },
         {
-          url: "https://picsum.photos/700/300",
+          url: "https://picsum.photos/400/400",
           id: 2,
         },
       ],
@@ -83,16 +83,6 @@ const org = {
 
 function OrgView() {
   const [addSection, setAddSection] = useState(false);
-
-  const [newReview, setNewReview] = useState({ text: "" });
-
-  const [error, setError] = useState(false);
-
-  const submitReview = () => {
-    if (newReview.text.length > 20) {
-      setError(true);
-    }
-  };
 
   return (
     <div className="min-vh-100">
@@ -168,30 +158,7 @@ function OrgView() {
             })}
           </div>
         ) : (
-          <div className="w-75 pt-3">
-            <Form className="newReviewSection p-3">
-              <FormGroup>
-                <Label for="newReviewText">{`Review (Maximum 200 characters)`}</Label>
-                <Input
-                  id="newReviewText"
-                  value={newReview.text}
-                  onChange={(e) => {
-                    setError(false);
-                    setNewReview((prevReview) => {
-                      return { ...prevReview, text: e.target.value };
-                    });
-                  }}
-                  type="textarea"
-                />
-                <p className="text-danger">
-                  {error ? "Review cannot be more than 200 characters" : ""}
-                </p>
-              </FormGroup>
-              <Button onClick={() => submitReview()} color="primary">
-                Submit
-              </Button>
-            </Form>
-          </div>
+          <NewReview />
         )}
       </div>
     </div>
