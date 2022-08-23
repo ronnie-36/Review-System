@@ -5,3 +5,43 @@
     padding: 20px;
     font-weight: 600;
 }
+
+.search__bar {
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search__bar__comp {
+    min-width: 300px;
+    height: 50px;
+    border-right: none;
+}
+
+.search__bar__comp:focus{
+    border-right: none;
+    outline: none;
+}
+
+.searchbar__Icon {
+    height: 50px;
+    width: 50px;
+    background-color: white;
+    display: grid;
+    place-items: center;
+    border: 2px solid black;
+    border-left: none;
+}
+
+.searchbar__Icon svg {
+    font-size: 35px;
+}
+
+.organisation_cards_search
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
