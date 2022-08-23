@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StarRatings from "react-star-ratings";
 import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
@@ -6,6 +6,7 @@ import { BsTelephoneFill } from "react-icons/bs";
 import "./css/OrgView.css";
 import Review from "../components/Review";
 import NewReview from "../components/NewReview";
+import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
 
 const org = {
   image: "/logo192.png",
@@ -83,6 +84,19 @@ const org = {
 
 function OrgView() {
   const [addSection, setAddSection] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
+
+  const pageSize = 5;
+
+  useEffect(() => {
+    setPageCount(Math.ceil(org.reviews.length / pageSize));
+  }, []);
+
+  const handleClick = (e, index) => {
+    e.preventDefault();
+    setCurrentPage(index);
+  };
 
   return (
     <div className="min-vh-100">
@@ -152,11 +166,53 @@ function OrgView() {
           </div>
         </div>
         {!addSection ? (
-          <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
-            {org.reviews.map((value) => {
-              return <Review key={value.id} review={value} />;
-            })}
-          </div>
+          <>
+            <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
+              {org.reviews
+                .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                .map((value) => {
+                  return <Review key={value.id} review={value} />;
+                })}
+            </div>
+            <Pagination aria-label="Page navigation example">
+              <PaginationItem disabled={currentPage <= 0}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, 0)}
+                  first
+                  href="#"
+                />
+              </PaginationItem>
+              <PaginationItem disabled={currentPage <= 0}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, currentPage - 1)}
+                  previous
+                  href="#"
+                />
+              </PaginationItem>
+              {[...Array(pageCount)].map((_, i) => (
+                <PaginationItem active={i === currentPage} key={i}>
+                  <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem disabled={currentPage >= pageCount - 1}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, currentPage + 1)}
+                  next
+                  href="#"
+                />
+              </PaginationItem>
+              <PaginationItem disabled={currentPage >= pageCount - 1}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, 0)}
+                  last
+                  href="#"
+                />
+              </PaginationItem>
+            </Pagination>
+          </>
         ) : (
           <NewReview />
         )}

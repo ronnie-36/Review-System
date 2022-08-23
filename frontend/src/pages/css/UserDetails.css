@@ -4,4 +4,14 @@
 
 .user-dets{
     background-color: #f2e8de78;
+    padding: 2rem;
+    width:75%
+}
+
+
+
+@media screen and (max-width:700px) {
+    .user-dets{
+        width:100%;
+    }
 }
