@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import OrgView from "./pages/OrgView";
+import UserDetails from "./pages/UserDetails";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/orgview" element={<OrgView />} />
+          <Route path="/userdetails" element={<UserDetails />} />
         </Routes>
       </Router>
     </>
