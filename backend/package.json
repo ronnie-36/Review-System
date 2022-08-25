@@ -19,10 +19,15 @@
     "express-session": "^1.17.0",
     "hbs": "^4.1.2",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
     "mysql2": "^2.3.3",
     "passport": "^0.6.0",
-    "passport-google-oidc": "^0.1.0",
-    "redis": "^4.0.1"
+    "passport-anonymous": "^1.0.1",
+    "passport-google-oauth2": "^0.2.0",
+    "passport-jwt": "^4.0.0",
+    "redis": "^4.0.1",
+    "twilio": "^3.80.1",
+    "uuid": "^8.3.2"
   }
 }
