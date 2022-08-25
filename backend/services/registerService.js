@@ -12,12 +12,40 @@ let createNewUser = (data) => {
                 ' INSERT INTO users set ? ', data,
                 function (err, rows) {
                     if (err) {
-                        reject(false)
+                        reject(err)
                     }
-                    resolve("Create a new user successful");
+                    resolve(data);
                 }
             );
         }
+    });
+};
+
+let update = (data, id) => {
+    return new Promise(async (resolve, reject) => {
+        DBConnection.query(
+            ' UPDATE users SET ? WHERE `id` = ?', [data, id],
+            function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+                resolve("Update successful");
+            }
+        );
+    });
+};
+
+let deleteUser = (id) => {
+    return new Promise(async (resolve, reject) => {
+        DBConnection.query(
+            ' DELETE from users WHERE `id` = ?', id,
+            function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+                resolve("Delete successful");
+            }
+        );
     });
 };
 
@@ -42,6 +70,33 @@ let checkExistEmail = (email) => {
         }
     });
 };
+
+let checkExistPhone = (phone) => {
+    return new Promise((resolve, reject) => {
+        try {
+            DBConnection.query(
+                ' SELECT * FROM `users` WHERE `phone` = ?  ', phone,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    if (rows.length > 0) {
+                        let user = rows[0];
+                        resolve(user);
+                    } else {
+                        resolve(false)
+                    }
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 export default {
-    createNewUser: createNewUser
+    createNewUser: createNewUser,
+    update: update,
+    deleteUser: deleteUser,
+    checkExistPhone: checkExistPhone,
 };

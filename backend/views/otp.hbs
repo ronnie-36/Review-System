@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Add Phone</title>
+    <link rel="shortcut icon" href="/images/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i" rel="stylesheet">
+    <link href="/stylesheets/main_registration.css" rel="stylesheet" media="all">
+    <script>
+        var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+        function validateOTP() {
+            var otp=document.forms["phoneform"]["otp"].value;
+            if(format.test(otp)){
+                Swal.fire({
+                    title: "OTP Not Allowed!",
+                    text: "OTP should not include special characters",
+                    button: "Okay",
+                    confirmButtonColor: "#4F4F4F"
+                });
+                return false;
+            }
+        }
+        function invalid_phone() {
+            setTimeout(Toast.fire({
+                icon: 'error',
+                title: 'OTP Invalid. Please try again.'
+            }), 3000);
+        }
+    </script>
+</head>
+<body onload="{{func}}">
+    <div class="page-wrapper bg-gra-03 p-t-45 p-b-50">
+        <div class="wrapper wrapper--w790">
+            <div class="card card-5">
+                <div class="card-heading">
+                    <h2 class="title">Add Phone</h2>
+                </div>
+                <div class="card-body">
+                    OTP has been sent to your phone {{ phone }}
+                    <br>
+                    <form name="phoneform" method="POST" action="/auth/phone/verifyOTP" onsubmit="return validateOTP()">
+                        <div class="form-row">
+                            <div class="name">OTP</div>
+                            <div class="value">
+                                <div class="input-group">
+                                    <input class="input--style-5" type="tel" name="phone" value="{{ phone }}" hidden> 
+                                    <input class="input--style-5" type="tel" name="otp" required autocomplete="false">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn--radius-2 btn--red" type="submit">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/javascripts/jquery.min.js"></script>
+</body>
+</html>
