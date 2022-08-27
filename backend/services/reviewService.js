@@ -32,6 +32,60 @@ let getSignedURL = (filetype) => {
     });
 };
 
+let addMultimedia = (data, type, id) => {
+    return new Promise(async (resolve, reject) => {
+        let media = {
+            mediaID: uuidv4(),
+            mediaref: data.name,
+            reviewID: id,
+            type: type,
+            caption: data.caption,
+        };
+        DBConnection.query(
+            ' INSERT INTO multimedia set ? ', media,
+            function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+                resolve("added");
+            }
+        );
+    });
+};
+
+let addReview = (review, id) => {
+    return new Promise(async (resolve, reject) => {
+        let newReview = {
+            reviewID: uuidv4(),
+            text: review.text,
+            rating: review.rating,
+            time: new Date().toISOString(),
+            author: id,
+            org: review.org,
+        };
+        DBConnection.query(
+            ' INSERT INTO review set ? ', newReview,
+            function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+            }
+        );
+        for (const image of review.images) {
+            await addMultimedia(image, "image", newReview.reviewID);
+        }
+        for (const video of review.videos) {
+            await addMultimedia(video, "video", newReview.reviewID);
+        }
+        for (const audio of review.audios) {
+            await addMultimedia(audio, "audio", newReview.reviewID);
+        }
+        resolve("added review");
+    });
+};
+
+
 export default {
     getSignedURL: getSignedURL,
+    addReview: addReview,
 };

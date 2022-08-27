@@ -11,4 +11,12 @@ router.post('/multimedia', ensureLoggedIn(), async function (req, res, next) {
     res.json(output);
 });
 
+// @desc    Add Review
+// @route   POST /review/add
+router.post('/add', ensureLoggedIn(), async function (req, res, next) {
+    const review = req.body;
+    await reviewService.addReview(review, req.user.id);
+    res.json("added");
+});
+
 export default router;
