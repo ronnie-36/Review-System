@@ -45,3 +45,23 @@
     justify-content: center;
     align-items: center;
 }
+
+.organisation__noresults
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.organisation__noresults p {
+    cursor: pointer;
+    color: blue;
+    text-decoration-line: underline;
+}
+
+.addOrg__modal .modal-content
+{
+    padding: 20px;
+}
+
