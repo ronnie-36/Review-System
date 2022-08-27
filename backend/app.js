@@ -2,17 +2,16 @@ import createError from "http-errors";
 import express from "express";
 import 'dotenv/config';
 import path from "path";
+import cors from "cors";
 import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
-import expressSession from "express-session";
 import logger from "morgan";
 import expressHbs from "express-handlebars";
 import passport from "passport";
-import redis from "redis";
-import connectRedis from "connect-redis";
 import flash from "connect-flash";
 import indexRouter from "./routes/index.js";
 import authRouter from "./routes/auth.js";
+import reviewRouter from "./routes/review.js";
 import passportConfig from "./middleware/passport.js";
 let app = express();
 
@@ -43,36 +42,13 @@ hbs.handlebars.registerHelper({
   inc: (v) => v + 1
 });
 
-// let redisClient = redis.createClient({
-//   url: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOSTNAME}:${process.env.REDIS_PORT}`,
-//   legacyMode: true
-// });
-
-// redisClient.connect();
-
-// redisClient.on('error', function (err) {
-//   console.log('Could not establish a connection with redis. ' + err);
-// });
-// redisClient.on('connect', function (err) {
-//   console.log('Connected to redis successfully');
-// });
-
-// let RedisStore = connectRedis(expressSession)
+app.use(cors());
 app.disable('x-powered-by');
 app.use(flash());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-// app.use(
-//   expressSession({
-//     store: new RedisStore({ client: redisClient }),
-//     secret: process.env.EXPRESS_SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//     name: "SessionCookie"
-//   })
-// );
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -81,6 +57,7 @@ app.use(passport.initialize());
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/review', reviewRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
