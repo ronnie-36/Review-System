@@ -2,6 +2,7 @@ import createError from "http-errors";
 import express from "express";
 import 'dotenv/config';
 import path from "path";
+import cors from "cors";
 import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -10,6 +11,7 @@ import passport from "passport";
 import flash from "connect-flash";
 import indexRouter from "./routes/index.js";
 import authRouter from "./routes/auth.js";
+import reviewRouter from "./routes/review.js";
 import passportConfig from "./middleware/passport.js";
 let app = express();
 
@@ -40,6 +42,7 @@ hbs.handlebars.registerHelper({
   inc: (v) => v + 1
 });
 
+app.use(cors());
 app.disable('x-powered-by');
 app.use(flash());
 app.use(logger('dev'));
@@ -54,6 +57,7 @@ app.use(passport.initialize());
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/review', reviewRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

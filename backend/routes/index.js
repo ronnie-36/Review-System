@@ -1,4 +1,3 @@
-import e from "express";
 import express from "express";
 import { ensureLoggedIn, ensureLoggedOut } from "../middleware/auth.js";
 let router = express.Router();
