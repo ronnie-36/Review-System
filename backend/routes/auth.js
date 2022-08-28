@@ -52,11 +52,31 @@ router.post("/phone", optionalJwtAuth, async function (req, res, next) {
       return res.redirect("http://localhost:3000/home");
     }
     if (req.user && req.user.phone != "") {
-      res.redirect("http://localhost:3000/home");
+      let verificationRequest = await verifyPhoneService.sendOTP(phone);
+      if (verificationRequest.status == "pending") {
+        res.status(200);
+        res.json({
+          status: "success",
+          message: "OTP sent successfully",
+        });
+        return res.end();
+      }
+      // res.status(404);
+      // res.json({
+      //   status: "error",
+      //   message: "Check the mobile number",
+      //   error: "User does not exist with this mobile number",
+      // });
+      // return res.end();
     } else {
       let verificationRequest = await verifyPhoneService.sendOTP(phone);
       if (verificationRequest.status == "pending") {
-        return res.render("otp", { phone: phone, layout: "layout_empty" });
+        res.status(200);
+        res.json({
+          status: "success",
+          message: "OTP sent successfully",
+        });
+        return res.end();
       } else {
         res.redirect("back"); // TODO: some error message
       }
@@ -78,10 +98,13 @@ router.post(
       var format = /\d{6}/;
       if (!format.test(otp) || otp == "") {
         res.clearCookie("jwt");
-        return res.render("landing", {
-          func: "invalid_phone()",
-          layout: "layout_empty",
+        res.status(401);
+        res.json({
+          status: "error",
+          message: "Wrong OTP",
+          error: "The OTP submitted is wrong",
         });
+        return res.end();
       }
       let verificationResult = await verifyPhoneService.verifyOTP(phone, otp);
       if (verificationResult.status === "approved") {
@@ -128,13 +151,20 @@ router.post(
             await registerService.update({ phone: phone }, req.user.id);
           }
         }
-        return res.redirect("/home");
-      } else {
-        res.render("otp", {
-          func: "invalid_otp()",
-          phone: phone,
-          layout: false,
+        res.status(200);
+        res.json({
+          status: "success",
+          message: "User Authenticated successfully",
         });
+        return res.end();
+      } else {
+        res.status(401);
+        res.json({
+          status: "error",
+          message: "Wrong OTP",
+          error: "The OTP submitted is wrong",
+        });
+        return res.end();
       }
     } catch (e) {
       next(e);
@@ -146,7 +176,7 @@ router.post(
 // @route   /auth/logout
 router.get("/logout", (req, res, next) => {
   res.clearCookie("jwt");
-  res.redirect("/");
+  res.redirect("http://localhost:3000/");
 });
 
 export default router;

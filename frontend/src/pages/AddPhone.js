@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./css/Login.css";
 import { Button, Card, CardBody, Input } from "reactstrap";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
-import { Link } from "react-router-dom";
+import { sendOTPMobile, verifyMobileOTP } from "../apiHelpers/authentication";
 
 function AddPhone() {
   const [user, setUser] = useState({ mobile: "" });
-  const [errors, setErrors] = useState({ mobile: false });
+  const [errors, setErrors] = useState({ mobile: "" });
   const [OTPSent, setOTPSent] = useState(false);
   const [OTPTimer, setOTPTimer] = useState(null);
   const [clearTimer, setClearTimer] = useState(null);
+  const [OTP, setOTP] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (OTPTimer && OTPTimer < 0) {
@@ -28,23 +32,35 @@ function AddPhone() {
     }
   }, [OTPTimer, clearTimer]);
 
-  function sendForOTP() {
+  async function sendForOTP() {
     const validMobile = isValidPhoneNumber(user.mobile);
 
-    if (validMobile) {
-      setOTPSent(true);
+    if (validMobile && !OTPTimer) {
       console.log(user.mobile);
-      setOTPTimer(120);
+      const response = await sendOTPMobile(user.mobile);
+      console.log(response);
+      if (response.status === "success") {
+        setOTPSent(true);
+        setOTPTimer(120);
+      }
     }
     if (!validMobile) {
-      setErrors({ ...errors, mobile: true });
+      setErrors({ ...errors, mobile: "Please enter a Valid Mobile Number" });
     }
   }
 
-  function handleMobileSignUp() {}
+  async function handleMobileSignUp() {
+    const response = await verifyMobileOTP(user.mobile, OTP);
+
+    if (response.status === "success") {
+      navigate("/");
+    } else if (response.status === "error") {
+      setErrors({ ...errors, mobile: "Wrong OTP" });
+    }
+  }
 
   function handelMobileChange(number) {
-    setErrors({ ...errors, mobile: false });
+    setErrors({ ...errors, mobile: "" });
     setUser({ ...user, mobile: number });
   }
 
@@ -65,12 +81,6 @@ function AddPhone() {
             />
           )}
 
-          {errors.mobile && (
-            <p className="w-100 mt-3 text-danger">
-              Please Enter a Valid Mobile Number
-            </p>
-          )}
-
           {!OTPSent && (
             <Button
               className="mt-3"
@@ -81,14 +91,26 @@ function AddPhone() {
             </Button>
           )}
 
-          {OTPSent && <Input className="mt-3" placeholder="Enter Mobile OTP" />}
+          {OTPSent && (
+            <Input
+              className="mt-3"
+              type="password"
+              value={OTP}
+              onChange={(e) => {
+                setErrors({ ...errors, mobile: "" });
+                setOTP(e.target.value);
+              }}
+              placeholder="Enter Mobile OTP"
+            />
+          )}
+          <p className="w-100 mt-3 text-danger">{errors.mobile}</p>
           {OTPSent && (
             <Button
               onClick={handleMobileSignUp}
               color="primary"
               className="mt-3 w-100"
             >
-              Register
+              Submit
             </Button>
           )}
           <div className="mt-3">
