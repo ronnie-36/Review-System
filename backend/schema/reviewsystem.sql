@@ -17,6 +17,66 @@ USE `reviewsystem`;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+DROP TABLE IF EXISTS `Organization`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Organization` (
+  `orgID` varchar(45) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `loc_lat` varchar(45) DEFAULT NULL,
+  `loc_long` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `address` varchar(45) DEFAULT NULL,
+  `email` varchar(45) DEFAULT NULL,
+  `website` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`orgID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `multimedia`
+--
+
+DROP TABLE IF EXISTS `multimedia`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `multimedia` (
+  `mediaID` varchar(45) NOT NULL,
+  `mediaref` varchar(100) NOT NULL,
+  `reviewID` varchar(45) DEFAULT NULL,
+  `orgID` varchar(45) DEFAULT NULL,
+  `caption` varchar(80) DEFAULT NULL,
+  `type` enum('audio','video','image') DEFAULT NULL,
+  PRIMARY KEY (`mediaID`),
+  KEY `is_for_review_idx` (`reviewID`),
+  KEY `is_for_org_idx` (`orgID`),
+  CONSTRAINT `is_for_org` FOREIGN KEY (`orgID`) REFERENCES `Organization` (`orgID`),
+  CONSTRAINT `is_for_review` FOREIGN KEY (`reviewID`) REFERENCES `review` (`reviewID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `review`
+--
+
+DROP TABLE IF EXISTS `review`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `review` (
+  `reviewID` varchar(45) NOT NULL,
+  `text` varchar(200) DEFAULT NULL,
+  `rating` int DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `author` varchar(45) DEFAULT NULL,
+  `org` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`reviewID`),
+  KEY `written_by_idx` (`author`),
+  KEY `written_for_idx` (`org`),
+  CONSTRAINT `written_by` FOREIGN KEY (`author`) REFERENCES `users` (`id`),
+  CONSTRAINT `written_for` FOREIGN KEY (`org`) REFERENCES `Organization` (`orgID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
 -- Table structure for table `users`
 --
@@ -44,4 +104,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-08-14  2:14:24
+-- Dump completed on 2022-08-27 23:19:49

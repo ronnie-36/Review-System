@@ -32,6 +32,132 @@ let getSignedURL = (filetype) => {
     });
 };
 
+let addMultimedia = (data, type, id) => {
+    return new Promise(async (resolve, reject) => {
+        let media = {
+            mediaID: uuidv4(),
+            mediaref: data.name,
+            reviewID: id,
+            type: type,
+            caption: data.caption,
+        };
+        DBConnection.query(
+            ' INSERT INTO multimedia set ? ', media,
+            function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+                resolve("added");
+            }
+        );
+    });
+};
+
+let addReview = (review, id) => {
+    return new Promise(async (resolve, reject) => {
+        let newReview = {
+            reviewID: uuidv4(),
+            text: review.text,
+            rating: review.rating,
+            time: new Date().toISOString(),
+            author: id,
+            org: review.org,
+        };
+        DBConnection.query(
+            ' INSERT INTO review set ? ', newReview,
+            function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+            }
+        );
+        for (const image of review.images) {
+            await addMultimedia(image, "image", newReview.reviewID);
+        }
+        for (const video of review.videos) {
+            await addMultimedia(video, "video", newReview.reviewID);
+        }
+        for (const audio of review.audios) {
+            await addMultimedia(audio, "audio", newReview.reviewID);
+        }
+        resolve("added review");
+    });
+};
+
+let getMultimedia = (id) => {
+    return new Promise(async (resolve, reject) => {
+        DBConnection.query(
+            ' SELECT * from multimedia WHERE reviewID = ? ', id,
+            async function (err, rows) {
+                if (err) {
+                    reject(err)
+                }
+                let multimedia = [...rows];
+                let output = {
+                    'images': [],
+                    'videos': [],
+                    'audios': []
+                };
+                multimedia.forEach((media) => {
+                    let url = process.env.AWS_S3_URL.concat(media.mediaref);
+                    switch (media.type) {
+                        case 'image': {
+                            output.images.push({ 'url': url, 'caption': media.caption });
+                            break;
+                        }
+                        case 'audio': {
+                            output.audios.push({ 'url': url, 'caption': media.caption });
+                            break;
+                        }
+                        case 'video': {
+                            output.videos.push({ 'url': url, 'caption': media.caption });
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                });
+                resolve(output);
+            }
+        );
+    });
+};
+
+let getReviews = (id, type) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let query = {};
+            if (type == "user") {
+                query = { 'author': id };
+            }
+            else if (type == "org") {
+                query = { 'org': id };
+            }
+            let reviews = [];
+            DBConnection.query(
+                ' SELECT * FROM review WHERE ? ', query,
+                async function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    // console.log(rows);
+                    reviews = [...rows];
+                    let output = [];
+                    for (let review of reviews) {
+                        let multimedia = await getMultimedia(review.reviewID);
+                        output.push({ ...review, ...multimedia });
+                    }
+                    resolve(output);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 export default {
     getSignedURL: getSignedURL,
+    addReview: addReview,
+    getReviews: getReviews,
 };
