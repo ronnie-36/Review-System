@@ -1,0 +1,12 @@
+.review{
+    background-color: #f2e8de78;
+    border-radius: 1rem;
+    width: 75%;
+    margin-top: 0.005rem;
+}
+
+@media screen and (max-width:700px) {
+    .review{
+        width:100%;
+    }
+}
