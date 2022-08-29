@@ -177,7 +177,9 @@ router.post(
 // @route   /auth/logout
 router.get("/logout", (req, res, next) => {
   res.clearCookie("jwt");
-  res.redirect("http://localhost:3000/");
+  res.status(200);
+  res.json({ status: "success", message: "Logged Out successfully" });
+  return res.end();
 });
 
 export default router;

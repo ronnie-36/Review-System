@@ -50,3 +50,15 @@ export const verifyMobileOTP = async (mobile, otp, id) => {
       console.log(err); //TODO : Something for errors
     });
 };
+
+export const logout = async () => {
+  const url = rooturl + "auth/logout";
+  const options = {
+    method: "GET",
+    credentials: "include",
+  };
+
+  return await fetch(url, options)
+    .then((response) => response.json())
+    .catch((err) => err);
+};
