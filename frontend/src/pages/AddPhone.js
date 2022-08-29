@@ -8,7 +8,7 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import { sendOTPMobile, verifyMobileOTP } from "../apiHelpers/authentication";
 
 function AddPhone() {
-  const [user, setUser] = useState({ mobile: "" });
+  const [user, setUser] = useState({ mobile: "", id: null });
   const [errors, setErrors] = useState({ mobile: "" });
   const [OTPSent, setOTPSent] = useState(false);
   const [OTPTimer, setOTPTimer] = useState(null);
@@ -40,6 +40,7 @@ function AddPhone() {
       const response = await sendOTPMobile(user.mobile);
       console.log(response);
       if (response.status === "success") {
+        setUser({ ...user, id: response.user });
         setOTPSent(true);
         setOTPTimer(120);
       }
@@ -50,7 +51,7 @@ function AddPhone() {
   }
 
   async function handleMobileSignUp() {
-    const response = await verifyMobileOTP(user.mobile, OTP);
+    const response = await verifyMobileOTP(user.mobile, OTP, user.id);
 
     if (response.status === "success") {
       navigate("/");

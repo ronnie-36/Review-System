@@ -36,7 +36,7 @@ router.get(
     if (req.user.phone == "") {
       res.redirect("http://localhost:3000/addphone");
     } else {
-      res.redirect("http://localhost:3000/home");
+      res.redirect("http://localhost:3000/");
     }
   }
 );
@@ -49,7 +49,7 @@ router.post("/phone", optionalJwtAuth, async function (req, res, next) {
     var format = /[ `!@#$%^&*()_\-=\[\]{};':"\\|,.<>\/?~]/;
     if (format.test(phone) || phone == "") {
       res.clearCookie("jwt");
-      return res.redirect("http://localhost:3000/home");
+      return res.redirect("http://localhost:3000/");
     }
     if (req.user && req.user.phone != "") {
       let verificationRequest = await verifyPhoneService.sendOTP(phone);
@@ -73,6 +73,7 @@ router.post("/phone", optionalJwtAuth, async function (req, res, next) {
       if (verificationRequest.status == "pending") {
         res.status(200);
         res.json({
+          user: req.user,
           status: "success",
           message: "OTP sent successfully",
         });

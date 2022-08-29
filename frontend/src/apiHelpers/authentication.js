@@ -29,9 +29,9 @@ export const sendOTPMobile = async (mobile) => {
   return returnValue;
 };
 
-export const verifyMobileOTP = async (mobile, otp) => {
+export const verifyMobileOTP = async (mobile, otp, id) => {
   const url = rooturl + "auth/phone/verifyOTP";
-  const data = { phone: mobile, otp: otp };
+  const data = { phone: mobile, otp: otp, user: id };
 
   const options = {
     method: "POST",
