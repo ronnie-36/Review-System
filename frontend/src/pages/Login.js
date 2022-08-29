@@ -5,14 +5,22 @@ import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { GoogleLoginButton } from "react-social-login-buttons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  loginWithGoogle,
+  sendOTPMobile,
+  verifyMobileOTP,
+} from "../apiHelpers/authentication";
 
 function Login() {
   const [mobile, setMobile] = useState("");
   const [OTPSent, setOTPSent] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [OTPTimer, setOTPTimer] = useState(null);
   const [clearTimer, setClearTimer] = useState(null);
+  const [OTP, setOTP] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (OTPTimer && OTPTimer < 0) {
@@ -29,24 +37,38 @@ function Login() {
     }
   }, [OTPTimer, clearTimer]);
 
-  function sendForOTP() {
+  async function sendForOTP() {
     if (isValidPhoneNumber(mobile)) {
-      setOTPSent(true);
-      console.log(mobile);
-      setOTPTimer(120);
+      const response = await sendOTPMobile(mobile);
+      if (response.status === "success") {
+        setOTPSent(true);
+        console.log(mobile);
+        setOTPTimer(120);
+      } else {
+        setError(response.error);
+      }
     } else {
-      setError(true);
+      setError("Please enter a Valid Mobile Number");
     }
   }
 
   function handelMobileChange(number) {
-    setError(false);
+    setError("");
     setMobile(number);
   }
 
-  function handleMobileLogin() {}
+  async function handleMobileLogin() {
+    const response = await verifyMobileOTP(mobile, OTP);
+    if (response.status === "success") {
+      navigate("/");
+    } else {
+      setError("Wrong OTP");
+    }
+  }
 
-  function handleGoogleLogin() {}
+  function handleGoogleLogin() {
+    loginWithGoogle();
+  }
 
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center LoginPage">
@@ -58,12 +80,20 @@ function Login() {
             onChange={handelMobileChange}
             defaultCountry="IN"
           />
-          {error && (
-            <p className="w-100 mt-3 text-danger">
-              Please Enter a Valid Mobile Number
-            </p>
+          {OTPSent && (
+            <Input
+              className="mt-3"
+              value={OTP}
+              onChange={(e) => {
+                setError("");
+                setOTP(e.target.value);
+              }}
+              placeholder="Enter OTP"
+            />
           )}
-          {OTPSent && <Input className="mt-3" placeholder="Enter OTP" />}
+
+          <p className="w-100 mt-3 text-danger">{error}</p>
+
           {OTPSent && (
             <Button
               onClick={handleMobileLogin}
@@ -91,10 +121,6 @@ function Login() {
           </div>
 
           <GoogleLoginButton className="w-100" onClick={handleGoogleLogin} />
-
-          <div>
-            New User? <Link to={"../signup"}>Register</Link>
-          </div>
         </CardBody>
       </Card>
     </div>

@@ -7,6 +7,7 @@ import "./css/OrgView.css";
 import Review from "../components/Review";
 import NewReview from "../components/NewReview";
 import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
+import Header from "../components/Header";
 
 const org = {
   image: "/logo192.png",
@@ -82,7 +83,7 @@ const org = {
   ],
 };
 
-function OrgView() {
+function OrgView({ logged, setLogged }) {
   const [addSection, setAddSection] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
@@ -100,6 +101,7 @@ function OrgView() {
 
   return (
     <div className="min-vh-100">
+      <Header logged={logged} setLogged={setLogged} />
       <div className="d-flex OrgView p-3">
         <div
           style={{ minHeight: "10rem" }}

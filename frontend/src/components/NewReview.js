@@ -3,6 +3,7 @@ import "react-dropzone-uploader/dist/styles.css";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import Dropzone from "react-dropzone-uploader";
 import StarRatings from "react-star-ratings";
+import PreviewMedia from "./PreviewMedia";
 
 function NewReview() {
   const [newReview, setNewReview] = useState({
@@ -28,6 +29,7 @@ function NewReview() {
   };
 
   const submitReview = () => {
+    console.log(newReview);
     if (newReview.text.length > 20) {
       setError(true);
     }
@@ -39,17 +41,17 @@ function NewReview() {
       audioPattern = /audio\/\w+/;
     if (status === "done") {
       if (imagePattern.test(file.type)) {
-        const newFile = { id: meta.id, meta: meta, file: file };
+        const newFile = { id: meta.id, meta: meta, file: file, caption: "" };
         setNewReview((oldReview) => {
           return { ...oldReview, images: [...oldReview.images, newFile] };
         });
       } else if (videoPattern.test(file.type)) {
-        const newFile = { id: meta.id, meta: meta, file: file };
+        const newFile = { id: meta.id, meta: meta, file: file, catption: "" };
         setNewReview((oldReview) => {
           return { ...oldReview, videos: [...oldReview.videos, newFile] };
         });
       } else if (audioPattern.test(file.type)) {
-        const newFile = { id: meta.id, meta: meta, file: file };
+        const newFile = { id: meta.id, meta: meta, file: file, caption: "" };
         setNewReview((oldReview) => {
           return { ...oldReview, videos: [...oldReview.audios, newFile] };
         });
@@ -131,6 +133,13 @@ function NewReview() {
           <Dropzone
             id="dropzone"
             onChangeStatus={handleChangeStatus}
+            PreviewComponent={(props) => {
+              return PreviewMedia({
+                ...props,
+                newReview: newReview,
+                setNewReview: setNewReview,
+              });
+            }}
             accept={`${checkImageValidation() ? "image/*," : ""}${
               checkVideoValidation() ? "video/*," : ""
             }${checkAudioValidation() ? "audio/*" : ""}`}

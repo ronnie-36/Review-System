@@ -1,12 +1,13 @@
 import React from "react";
-import { Navbar, NavbarBrand, NavLink, Nav, NavItem, Button } from "reactstrap";
+import { Button } from "reactstrap";
 import "./Home.css";
 import { FaSearch } from "react-icons/fa";
 import OrgainsationCard from "../components/OrgainsationCard";
 import Orgdata from "./orgTemp.json";
 import { Modal, Form, FormGroup, Label, Input } from "reactstrap";
+import Header from "../components/Header";
 
-function Home() {
+function Home({ logged, setLogged }) {
   const [inputText, setInputText] = React.useState("");
   const [searchResult, setSearchResult] = React.useState([]);
   const [addOrgDetails, setAddOrgDetails] = React.useState({});
@@ -42,28 +43,7 @@ function Home() {
 
   return (
     <>
-      <Navbar
-        style={{ backgroundColor: "#ff7100" }}
-        className="navbar__homepage"
-      >
-        <NavbarBrand>Review System</NavbarBrand>
-        <Nav className="ml-auto" navbar>
-          <NavItem
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              padding: "5px",
-            }}
-          >
-            <i
-              className="bx bx-user"
-              style={{ paddingRight: "10px", cursor: "pointer" }}
-            ></i>
-            <NavLink href="/login/">Login</NavLink>
-          </NavItem>
-        </Nav>
-      </Navbar>
+      <Header logged={logged} setLogged={setLogged} />
 
       {/* search bar */}
       <div className="search__bar">

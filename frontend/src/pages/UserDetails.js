@@ -12,6 +12,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import Review from "../components/Review";
 
 import "./css/UserDetails.css";
+import Header from "../components/Header";
 
 const user = {
   reviews: [
@@ -81,7 +82,7 @@ const user = {
   ],
 };
 
-function UserDetails() {
+function UserDetails({ logged, setLogged }) {
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [editMobile, setEditMobile] = useState(false);
@@ -210,163 +211,176 @@ function UserDetails() {
   }
 
   return (
-    <div className="user-dets-container d-flex flex-row justify-content-center align-items-center">
-      <div className="user-dets">
-        {!editMobile ? (
-          <div className="d-flex flex-row justify-content-between">
-            <div className="info-display mobile-display">
-              <div className="fw-bold">Mobile Number</div>
-              <div className="">{mobile}</div>
-            </div>
-            <div>
-              <Button color="danger" onClick={() => setEditMobile(true)}>
-                <FaEdit />
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="d-flex py-3 justify-content-between">
-            <div className="d-flex flex-column">
-              <div className="fw-bold">New Mobile Number</div>
-              <PhoneInput
-                placeholder="Enter phone number"
-                value={newMobile}
-                onChange={handelMobileChange}
-                defaultCountry="IN"
-              />
-              {mobError && (
-                <p className="w-100 mt-3 text-danger">
-                  Please Enter a Valid Mobile Number
-                </p>
-              )}
-              {mobOTPSent && <Input className="mt-3" placeholder="Enter OTP" />}
-              <Button
-                className="w-25 mt-1"
-                color="danger"
-                onClick={handleMobCancel}
-              >
-                Cancel
-              </Button>
-            </div>
-            <div className="d-flex flex-column justify-content-between">
-              <Button
-                onClick={sendForMobOTP}
-                color="primary"
-                disabled={mobOTPSent && mobOTPTimer != null}
-                className=""
-              >
-                {mobOTPSent ? "Resend OTP" : "Get OTP"}
-              </Button>
-              {mobOTPTimer && <p>Resend OTP in {mobOTPTimer} seconds</p>}
-              {mobOTPSent && (
-                <Button onClick={submitMobOTP} color="primary">
-                  Submit OTP
+    <>
+      <Header logged setLogged />
+      <div className="user-dets-container d-flex flex-row justify-content-center mt-3 align-items-center">
+        <div className="user-dets">
+          {!editMobile ? (
+            <div className="d-flex flex-row justify-content-between">
+              <div className="info-display mobile-display">
+                <div className="fw-bold">Mobile Number</div>
+                <div className="">{mobile}</div>
+              </div>
+              <div>
+                <Button color="danger" onClick={() => setEditMobile(true)}>
+                  <FaEdit />
                 </Button>
-              )}
+              </div>
             </div>
-          </div>
-        )}
-        {!editEmail ? (
-          <div className="d-flex flex-row justify-content-between">
-            <div className="info-display mobile-display">
-              <div className="fw-bold">Email ID</div>
-              <div className="">{email}</div>
-            </div>
-            <div>
-              <Button color="danger" onClick={() => setEditEmail(true)}>
-                <FaEdit />
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="d-flex py-3 justify-content-between">
-            <div className="d-flex flex-column">
-              <div className="fw-bold">New Email</div>
-              <Input
-                className="mt-3"
-                type="email"
-                value={newEmail}
-                onChange={handleEmailChange}
-                placeholder="Email ID"
-              />
-              {emailError && (
-                <p className="w-100 mt-3 text-danger">
-                  Please Enter a Valid Email
-                </p>
-              )}
-              {emailOTPSent && (
-                <Input className="mt-3" placeholder="Enter OTP" />
-              )}
-              <Button
-                color="danger"
-                className="w-25 mt-1"
-                onClick={handleEmailCancel}
-              >
-                Cancel
-              </Button>
-            </div>
-            <div className="d-flex flex-column p-2 justify-content-between">
-              <Button
-                onClick={sendForEmailOTP}
-                color="primary"
-                disabled={emailOTPSent && emailOTPTimer != null}
-                className=""
-              >
-                {emailOTPSent ? "Resend OTP" : "Get OTP"}
-              </Button>
-              {emailOTPTimer && <p>Resend OTP in {emailOTPTimer} seconds</p>}
-              {emailOTPSent && (
-                <Button onClick={submitEmailOTP} color="primary">
-                  Submit OTP
+          ) : (
+            <div className="d-flex py-3 justify-content-between">
+              <div className="d-flex flex-column">
+                <div className="fw-bold">New Mobile Number</div>
+                <PhoneInput
+                  placeholder="Enter phone number"
+                  value={newMobile}
+                  onChange={handelMobileChange}
+                  defaultCountry="IN"
+                />
+                {mobError && (
+                  <p className="w-100 mt-3 text-danger">
+                    Please Enter a Valid Mobile Number
+                  </p>
+                )}
+                {mobOTPSent && (
+                  <Input className="mt-3" placeholder="Enter OTP" />
+                )}
+                <Button
+                  className="w-25 mt-1"
+                  color="danger"
+                  onClick={handleMobCancel}
+                >
+                  Cancel
                 </Button>
-              )}
+              </div>
+              <div className="d-flex flex-column justify-content-between">
+                <Button
+                  onClick={sendForMobOTP}
+                  color="primary"
+                  disabled={mobOTPSent && mobOTPTimer != null}
+                  className=""
+                >
+                  {mobOTPSent ? "Resend OTP" : "Get OTP"}
+                </Button>
+                {mobOTPTimer && <p>Resend OTP in {mobOTPTimer} seconds</p>}
+                {mobOTPSent && (
+                  <Button onClick={submitMobOTP} color="primary">
+                    Submit OTP
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+          {!editEmail ? (
+            <div className="d-flex flex-row justify-content-between">
+              <div className="info-display mobile-display">
+                <div className="fw-bold">Email ID</div>
+                <div className="">{email}</div>
+              </div>
+              <div>
+                <Button color="danger" onClick={() => setEditEmail(true)}>
+                  <FaEdit />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="d-flex py-3 justify-content-between">
+              <div className="d-flex flex-column">
+                <div className="fw-bold">New Email</div>
+                <Input
+                  className="mt-3"
+                  type="email"
+                  value={newEmail}
+                  onChange={handleEmailChange}
+                  placeholder="Email ID"
+                />
+                {emailError && (
+                  <p className="w-100 mt-3 text-danger">
+                    Please Enter a Valid Email
+                  </p>
+                )}
+                {emailOTPSent && (
+                  <Input className="mt-3" placeholder="Enter OTP" />
+                )}
+                <Button
+                  color="danger"
+                  className="w-25 mt-1"
+                  onClick={handleEmailCancel}
+                >
+                  Cancel
+                </Button>
+              </div>
+              <div className="d-flex flex-column p-2 justify-content-between">
+                <Button
+                  onClick={sendForEmailOTP}
+                  color="primary"
+                  disabled={emailOTPSent && emailOTPTimer != null}
+                  className=""
+                >
+                  {emailOTPSent ? "Resend OTP" : "Get OTP"}
+                </Button>
+                {emailOTPTimer && <p>Resend OTP in {emailOTPTimer} seconds</p>}
+                {emailOTPSent && (
+                  <Button onClick={submitEmailOTP} color="primary">
+                    Submit OTP
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
-        <div className=" mt-3 reviews w-100 d-flex flex-column">
-          <div className="fw-bold">My Reviews</div>
-          {user.reviews
-            .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-            .map((value) => {
-              return <Review key={value.id} review={value} />;
-            })}
-        </div>
-        <Pagination
-          className="d-flex justify-content-center"
-          aria-label="Page navigation example"
-        >
-          <PaginationItem disabled={currentPage <= 0}>
-            <PaginationLink onClick={(e) => handleClick(e, 0)} first href="#" />
-          </PaginationItem>
-          <PaginationItem disabled={currentPage <= 0}>
-            <PaginationLink
-              onClick={(e) => handleClick(e, currentPage - 1)}
-              previous
-              href="#"
-            />
-          </PaginationItem>
-          {[...Array(pageCount)].map((_, i) => (
-            <PaginationItem active={i === currentPage} key={i}>
-              <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
-                {i + 1}
-              </PaginationLink>
+          <div className=" mt-3 reviews w-100 d-flex flex-column">
+            <div className="fw-bold">My Reviews</div>
+            {user.reviews
+              .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+              .map((value) => {
+                return <Review key={value.id} review={value} />;
+              })}
+          </div>
+          <Pagination
+            className="d-flex justify-content-center"
+            aria-label="Page navigation example"
+          >
+            <PaginationItem disabled={currentPage <= 0}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, 0)}
+                first
+                href="#"
+              />
             </PaginationItem>
-          ))}
+            <PaginationItem disabled={currentPage <= 0}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, currentPage - 1)}
+                previous
+                href="#"
+              />
+            </PaginationItem>
+            {[...Array(pageCount)].map((_, i) => (
+              <PaginationItem active={i === currentPage} key={i}>
+                <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
 
-          <PaginationItem disabled={currentPage >= pageCount - 1}>
-            <PaginationLink
-              onClick={(e) => handleClick(e, currentPage + 1)}
-              next
-              href="#"
-            />
-          </PaginationItem>
-          <PaginationItem disabled={currentPage >= pageCount - 1}>
-            <PaginationLink onClick={(e) => handleClick(e, 0)} last href="#" />
-          </PaginationItem>
-        </Pagination>
+            <PaginationItem disabled={currentPage >= pageCount - 1}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, currentPage + 1)}
+                next
+                href="#"
+              />
+            </PaginationItem>
+            <PaginationItem disabled={currentPage >= pageCount - 1}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, 0)}
+                last
+                href="#"
+              />
+            </PaginationItem>
+          </Pagination>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
