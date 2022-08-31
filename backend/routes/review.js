@@ -3,7 +3,7 @@ import { ensureLoggedIn } from "../middleware/auth.js";
 import reviewService from "../services/reviewService.js";
 let router = express.Router();
 
-// @desc    Get signed URL for Multimedia
+// @desc    Returns signed URL for Multimedia and filename
 // @route   POST /review/multimedia
 router.post('/multimedia', ensureLoggedIn(), async function (req, res, next) {
     const { filetype } = req.body;
