@@ -27,7 +27,7 @@ let addOrg = (place_id) => {
                             ' INSERT INTO Organization set ? ', newOrg,
                             function (err, rows) {
                                 if (err) {
-                                    reject(err)
+                                    reject(err);
                                 }
                                 resolve(newOrg);
                             }
@@ -50,12 +50,13 @@ let checkExistOrg = (orgID) => {
                 ' SELECT * FROM `Organization` WHERE `orgID` = ?  ', orgID,
                 function (err, rows) {
                     if (err) {
-                        reject(err)
+                        throw (err);
                     }
                     if (rows.length > 0) {
-                        resolve(rows[0])
-                    } else {
-                        resolve(false)
+                        resolve(rows[0]);
+                    }
+                    else {
+                        resolve(false);
                     }
                 }
             );
@@ -71,7 +72,8 @@ let getOrg = (place_id) => {
             let existingOrg = await checkExistOrg(place_id);
             if (existingOrg) {
                 resolve(existingOrg);
-            } else {
+            }
+            else {
                 let newOrg = await addOrg(place_id);
                 if (!newOrg) {
                     reject(false);
