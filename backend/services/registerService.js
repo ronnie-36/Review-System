@@ -2,50 +2,63 @@ import DBConnection from "../config/db.js";
 
 let createNewUser = (data) => {
     return new Promise(async (resolve, reject) => {
-        // check email is exist or not
-        let existingEmail = await checkExistEmail(data.email);
-        if (existingEmail) {
-            reject(`This email "${data.email}" already exists. Please choose an other email`);
-        } else {
-            //create a new account
-            DBConnection.query(
-                ' INSERT INTO users set ? ', data,
-                function (err, rows) {
-                    if (err) {
-                        reject(err)
+        try {
+            // check email is exist or not
+            let existingEmail = await checkExistEmail(data.email);
+            if (existingEmail) {
+                throw (`This email "${data.email}" already exists. Please choose an other email`);
+            }
+            else {
+                //create a new account
+                DBConnection.query(
+                    ' INSERT INTO users set ? ', data,
+                    function (err, rows) {
+                        if (err) {
+                            throw (err);
+                        }
+                        resolve(data);
                     }
-                    resolve(data);
-                }
-            );
+                );
+            }
+        } catch (err) {
+            reject(err);
         }
     });
 };
 
 let update = (data, id) => {
     return new Promise(async (resolve, reject) => {
-        DBConnection.query(
-            ' UPDATE users SET ? WHERE `id` = ?', [data, id],
-            function (err, rows) {
-                if (err) {
-                    reject(err)
+        try {
+            DBConnection.query(
+                ' UPDATE users SET ? WHERE `id` = ?', [data, id],
+                function (err, rows) {
+                    if (err) {
+                        throw (err);
+                    }
+                    resolve("Update successful");
                 }
-                resolve("Update successful");
-            }
-        );
+            );
+        } catch (err) {
+            reject(err);
+        }
     });
 };
 
 let deleteUser = (id) => {
     return new Promise(async (resolve, reject) => {
-        DBConnection.query(
-            ' DELETE from users WHERE `id` = ?', id,
-            function (err, rows) {
-                if (err) {
-                    reject(err)
+        try {
+            DBConnection.query(
+                ' DELETE from users WHERE `id` = ?', id,
+                function (err, rows) {
+                    if (err) {
+                        throw (err);
+                    }
+                    resolve("Delete successful");
                 }
-                resolve("Delete successful");
-            }
-        );
+            );
+        } catch (err) {
+            reject(err);
+        }
     });
 };
 
@@ -56,12 +69,13 @@ let checkExistEmail = (email) => {
                 ' SELECT * FROM `users` WHERE `email` = ?  ', email,
                 function (err, rows) {
                     if (err) {
-                        reject(err)
+                        throw (err);
                     }
                     if (rows.length > 0) {
-                        resolve(true)
-                    } else {
-                        resolve(false)
+                        resolve(true);
+                    }
+                    else {
+                        resolve(false);
                     }
                 }
             );
@@ -78,13 +92,14 @@ let checkExistPhone = (phone) => {
                 ' SELECT * FROM `users` WHERE `phone` = ?  ', phone,
                 function (err, rows) {
                     if (err) {
-                        reject(err)
+                        throw (err);
                     }
                     if (rows.length > 0) {
                         let user = rows[0];
                         resolve(user);
-                    } else {
-                        resolve(false)
+                    }
+                    else {
+                        resolve(false);
                     }
                 }
             );

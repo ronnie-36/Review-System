@@ -7,7 +7,7 @@ let findUserByEmail = (email) => {
                 ' SELECT * FROM `users` WHERE `email` = ?  ', email,
                 function (err, rows) {
                     if (err) {
-                        reject(err)
+                        throw (err);
                     }
                     let user = rows[0];
                     resolve(user);
@@ -26,7 +26,7 @@ let findUserByPhone = (phone) => {
                 ' SELECT * FROM `users` WHERE `phone` = ?  ', phone,
                 function (err, rows) {
                     if (err) {
-                        reject(err)
+                        throw (err);
                     }
                     let user = rows[0];
                     resolve(user);
@@ -45,7 +45,7 @@ let findUserById = (id) => {
                 ' SELECT * FROM `users` WHERE `id` = ?  ', id,
                 function (err, rows) {
                     if (err) {
-                        reject(err)
+                        throw (err);
                     }
                     let user = rows[0];
                     resolve(user);

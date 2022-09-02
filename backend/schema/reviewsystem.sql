@@ -22,11 +22,11 @@ DROP TABLE IF EXISTS `Organization`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Organization` (
   `orgID` varchar(45) NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
+  `name` varchar(120) DEFAULT NULL,
   `loc_lat` varchar(45) DEFAULT NULL,
   `loc_long` varchar(45) DEFAULT NULL,
   `phone` varchar(45) DEFAULT NULL,
-  `address` varchar(45) DEFAULT NULL,
+  `address` varchar(150) DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
   `website` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`orgID`)
