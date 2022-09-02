@@ -1,5 +1,5 @@
 import React from "react";
-import "./OrgainsationCard.css";
+import "./css/OrgainsationCard.css";
 import StarRatings from "react-star-ratings";
 
 function OrgainsationCard({ name, rating }) {

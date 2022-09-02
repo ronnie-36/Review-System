@@ -1,7 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../apiHelpers/authentication";
 import { Nav, NavLink, NavItem, NavbarBrand, Navbar } from "reactstrap";
+import "./css/Header.css";
 
 function Header({ logged, setLogged }) {
   const navigate = useNavigate();
@@ -21,7 +22,11 @@ function Header({ logged, setLogged }) {
       style={{ backgroundColor: "rgb(58, 172, 203)" }}
       className="navbar__homepage"
     >
-      <NavbarBrand>Review System</NavbarBrand>
+      <NavbarBrand>
+        <Link className="customlink" to="/">
+          Review System
+        </Link>
+      </NavbarBrand>
       <Nav className="ml-auto" navbar>
         <NavItem
           style={{
@@ -31,10 +36,9 @@ function Header({ logged, setLogged }) {
             padding: "5px",
           }}
         >
-          <i
-            className="bx bx-user"
-            style={{ paddingRight: "10px", cursor: "pointer" }}
-          ></i>
+          <Link className="me-3 customlink" to="/userdetails">
+            My Reviews
+          </Link>
           {!logged ? (
             <NavLink href="/login/">Login</NavLink>
           ) : (

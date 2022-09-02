@@ -18,18 +18,18 @@ function Review({ review }) {
       <div className="">{review.text}</div>
       <div className="reviewImages d-flex flex-wrap">
         {review.images.map((value) => {
-          return <ModalImage key={value.id} image={value} />;
+          return <ModalImage key={value.url} image={value} />;
         })}
       </div>
       <div className="reviewVideos d-flex flex-wrap">
         {review.videos.map((value) => {
-          return <ModalVideo key={value.id} video={value} />;
+          return <ModalVideo key={value.url} video={value} />;
         })}
       </div>
       <div className="reviewAudios d-flex flex-wrap">
         {review.audios.map((value) => {
           return (
-            <div key={value.id} className="mw-100 p-1">
+            <div key={value.url} className="mw-100 p-1">
               <audio className="mw-100" controls>
                 <source src={value.url} />
               </audio>

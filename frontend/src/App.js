@@ -10,10 +10,14 @@ import Home from "./pages/Home";
 import OrgView from "./pages/OrgView";
 import UserDetails from "./pages/UserDetails";
 import AddPhone from "./pages/AddPhone";
+// import "fs";
+
+// require("dotenv").config();
 
 function App() {
   const [logged, setLogged] = useState(false);
-  const [userID, setUserID] = useState("");
+  const [userID, setUserID] = useState(null);
+  const [org, setOrg] = useState(null);
 
   useEffect(() => {
     const cookie = Cookies.get();
@@ -38,7 +42,13 @@ function App() {
           <Route
             path="/"
             element={
-              <Home logged={logged} setLogged={setLogged} userID={userID} />
+              <Home
+                logged={logged}
+                setLogged={setLogged}
+                userID={userID}
+                org={org}
+                setOrg={setOrg}
+              />
             }
           />
           <Route
@@ -57,7 +67,12 @@ function App() {
           <Route
             path="/orgview"
             element={
-              <OrgView logged={logged} setLogged={setLogged} userID={userID} />
+              <OrgView
+                logged={logged}
+                setLogged={setLogged}
+                userID={userID}
+                org={org}
+              />
             }
           />
           <Route

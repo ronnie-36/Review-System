@@ -13,76 +13,10 @@ import Review from "../components/Review";
 
 import "./css/UserDetails.css";
 import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
+import { fetchReviewsByUser } from "../apiHelpers/review";
 
-const user = {
-  reviews: [
-    {
-      id: 1,
-      author: "user 1.2.3",
-      text: "text",
-      rating: 2,
-      videos: [
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          id: 1,
-        },
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-          id: 2,
-        },
-      ],
-      images: [
-        {
-          url: "https://picsum.photos/500/300",
-          id: 1,
-        },
-        {
-          url: "https://picsum.photos/400/300",
-          id: 2,
-        },
-      ],
-      audios: [
-        {
-          url: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
-          id: 1,
-        },
-        {
-          url: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
-          id: 2,
-        },
-      ],
-    },
-    {
-      id: 2,
-      author: "someone not user",
-      text: "I enjoyed the services a lot",
-      rating: 4,
-      videos: [
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          id: 1,
-        },
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-          id: 2,
-        },
-      ],
-      images: [
-        {
-          url: "https://picsum.photos/300/300",
-          id: 1,
-        },
-        {
-          url: "https://picsum.photos/400/400",
-          id: 2,
-        },
-      ],
-      audios: [],
-    },
-  ],
-};
-
-function UserDetails({ logged, setLogged }) {
+function UserDetails({ logged, setLogged, userID }) {
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [editMobile, setEditMobile] = useState(false);
@@ -98,15 +32,31 @@ function UserDetails({ logged, setLogged }) {
   const [mobClearTimer, setMobClearTimer] = useState(null);
   const [emailClearTimer, setEmailClearTimer] = useState(null);
 
+  const [reviews, setReviews] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
-
+  console.log(userID);
   const pageSize = 5;
-
+  const navigate = useNavigate();
   useEffect(() => {
+    if (userID === null) {
+      navigate("/");
+    } else {
+      (async function () {
+        const response = await fetchReviewsByUser(userID);
+        if (response.status === "success") {
+          console.log(response.reviews);
+          setReviews(response.reviews);
+          setPageCount(Math.ceil(response.reviews.length / pageSize));
+        } else {
+          //Error Handling
+        }
+      })();
+    }
+
     setMobile("+9197054321");
     setEmail("keelis@gmail.com");
-    setPageCount(Math.ceil(user.reviews.length / pageSize));
     if (mobOTPTimer && mobOTPTimer < 0) {
       console.log(mobOTPTimer);
       clearInterval(mobClearTimer);
@@ -132,7 +82,7 @@ function UserDetails({ logged, setLogged }) {
       );
       setEmailClearTimer(timeout);
     }
-  }, [mobOTPTimer, mobClearTimer, emailOTPTimer, emailClearTimer]);
+  }, [mobOTPTimer, mobClearTimer, emailOTPTimer, emailClearTimer, userID]);
 
   const handleClick = (e, index) => {
     e.preventDefault();
@@ -212,10 +162,10 @@ function UserDetails({ logged, setLogged }) {
 
   return (
     <>
-      <Header logged setLogged />
-      <div className="user-dets-container d-flex flex-row justify-content-center mt-3 align-items-center">
+      <Header logged={logged} setLogged={setLogged} />
+      <div className="user-dets-container d-flex flex-row justify-content-center mt-3">
         <div className="user-dets">
-          {!editMobile ? (
+          {/* {!editMobile ? (
             <div className="d-flex flex-row justify-content-between">
               <div className="info-display mobile-display">
                 <div className="fw-bold">Mobile Number</div>
@@ -327,57 +277,59 @@ function UserDetails({ logged, setLogged }) {
                 )}
               </div>
             </div>
-          )}
+          )} */}
 
-          <div className=" mt-3 reviews w-100 d-flex flex-column">
-            <div className="fw-bold">My Reviews</div>
-            {user.reviews
+          <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
+            <div className="fw-bold align-self-center">My Reviews</div>
+            {reviews
               .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
               .map((value) => {
                 return <Review key={value.id} review={value} />;
               })}
           </div>
-          <Pagination
-            className="d-flex justify-content-center"
-            aria-label="Page navigation example"
-          >
-            <PaginationItem disabled={currentPage <= 0}>
-              <PaginationLink
-                onClick={(e) => handleClick(e, 0)}
-                first
-                href="#"
-              />
-            </PaginationItem>
-            <PaginationItem disabled={currentPage <= 0}>
-              <PaginationLink
-                onClick={(e) => handleClick(e, currentPage - 1)}
-                previous
-                href="#"
-              />
-            </PaginationItem>
-            {[...Array(pageCount)].map((_, i) => (
-              <PaginationItem active={i === currentPage} key={i}>
-                <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
-                  {i + 1}
-                </PaginationLink>
+          {reviews.length !== 0 && (
+            <Pagination
+              className="d-flex justify-content-center"
+              aria-label="Page navigation example"
+            >
+              <PaginationItem disabled={currentPage <= 0}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, 0)}
+                  first
+                  href="#"
+                />
               </PaginationItem>
-            ))}
+              <PaginationItem disabled={currentPage <= 0}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, currentPage - 1)}
+                  previous
+                  href="#"
+                />
+              </PaginationItem>
+              {[...Array(pageCount)].map((_, i) => (
+                <PaginationItem active={i === currentPage} key={i}>
+                  <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
 
-            <PaginationItem disabled={currentPage >= pageCount - 1}>
-              <PaginationLink
-                onClick={(e) => handleClick(e, currentPage + 1)}
-                next
-                href="#"
-              />
-            </PaginationItem>
-            <PaginationItem disabled={currentPage >= pageCount - 1}>
-              <PaginationLink
-                onClick={(e) => handleClick(e, 0)}
-                last
-                href="#"
-              />
-            </PaginationItem>
-          </Pagination>
+              <PaginationItem disabled={currentPage >= pageCount - 1}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, currentPage + 1)}
+                  next
+                  href="#"
+                />
+              </PaginationItem>
+              <PaginationItem disabled={currentPage >= pageCount - 1}>
+                <PaginationLink
+                  onClick={(e) => handleClick(e, 0)}
+                  last
+                  href="#"
+                />
+              </PaginationItem>
+            </Pagination>
+          )}
         </div>
       </div>
     </>
