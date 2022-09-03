@@ -10,6 +10,8 @@ import Review from "../components/Review";
 import NewReview from "../components/NewReview";
 import Header from "../components/Header";
 import { fetchReviewsByOrg } from "../apiHelpers/review";
+import { Loader } from "@googlemaps/js-api-loader";
+import initMap from "./js/orgMap";
 
 function OrgView({ logged, setLogged, userID, org }) {
   const [addSection, setAddSection] = useState(false);
@@ -18,6 +20,11 @@ function OrgView({ logged, setLogged, userID, org }) {
   const [reviews, setReviews] = useState([]);
   const [avgRating, setavgRating] = useState(0);
 
+  const loader = new Loader({
+    apiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+    version: "weekly",
+    libraries: ["places"],
+  });
   const pageSize = 5;
   const navigate = useNavigate();
   useEffect(() => {
@@ -39,8 +46,20 @@ function OrgView({ logged, setLogged, userID, org }) {
           //Error Handling
         }
       })();
+
+      (async () => {
+        await loader
+          .load()
+          .then((google) => {
+            // new google.maps.Map(document.getElementById("map"), mapOptions);
+            initMap(google, org.loc_lat, org.loc_long);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })();
     }
-  }, [org, addSection, navigate]);
+  }, [org, addSection, navigate, loader]);
 
   const handleClick = (e, index) => {
     e.preventDefault();
@@ -97,6 +116,7 @@ function OrgView({ logged, setLogged, userID, org }) {
               {org.email ? org.email : "NA"}
             </div>
           </div>
+          <div id="static-map"></div>
         </div>
       </div>
       <div className="d-flex flex-column align-items-center">

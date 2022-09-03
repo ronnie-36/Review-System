@@ -4,11 +4,14 @@ import ModalImage from "./ModalImage";
 import ModalVideo from "./ModalVideo";
 import "./css/Review.css";
 
+import { parseTime } from "./js/utils";
+
 function Review({ review }) {
   //console.log(review);
   return (
     <div className="review p-5">
       <div className="fw-bold">{review.author}</div>
+      <div>{parseTime(review.time)}</div>
       <StarRatings
         rating={review.rating}
         numberOfStars={5}
@@ -33,6 +36,7 @@ function Review({ review }) {
               <audio className="mw-100" controls>
                 <source src={value.url} />
               </audio>
+              <p>{value.caption}</p>
             </div>
           );
         })}

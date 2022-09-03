@@ -22,11 +22,7 @@ function Header({ logged, setLogged }) {
       style={{ backgroundColor: "rgb(58, 172, 203)" }}
       className="navbar__homepage"
     >
-      <NavbarBrand>
-        <Link className="customlink" to="/">
-          Review System
-        </Link>
-      </NavbarBrand>
+      <NavbarBrand href="/">Review System</NavbarBrand>
       <Nav className="ml-auto" navbar>
         <NavItem
           style={{
@@ -36,9 +32,11 @@ function Header({ logged, setLogged }) {
             padding: "5px",
           }}
         >
-          <Link className="me-3 customlink" to="/userdetails">
-            My Reviews
-          </Link>
+          {logged && (
+            <Link className="me-3 customlink" to="/userdetails">
+              My Reviews
+            </Link>
+          )}
           {!logged ? (
             <NavLink href="/login/">Login</NavLink>
           ) : (

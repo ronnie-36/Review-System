@@ -21,6 +21,7 @@ function ModalVideo({ video }) {
         <video key={video.url} controls>
           <source src={video.url} />
         </video>
+        <p style={{ textAlign: "center" }}>{video.caption}</p>
       </Modal>
     </>
   );

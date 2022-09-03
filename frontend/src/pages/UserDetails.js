@@ -284,7 +284,7 @@ function UserDetails({ logged, setLogged, userID }) {
             {reviews
               .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
               .map((value) => {
-                return <Review key={value.id} review={value} />;
+                return <Review key={value.reviewID} review={value} />;
               })}
           </div>
           {reviews.length !== 0 && (
