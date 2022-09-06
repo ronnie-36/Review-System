@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import StarRatings from "react-star-ratings";
 import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
@@ -20,13 +20,19 @@ function OrgView({ logged, setLogged, userID, org }) {
   const [reviews, setReviews] = useState([]);
   const [avgRating, setavgRating] = useState(0);
 
-  const loader = new Loader({
-    apiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY,
-    version: "weekly",
-    libraries: ["places"],
-  });
   const pageSize = 5;
   const navigate = useNavigate();
+
+  const loader = useMemo(
+    () =>
+      new Loader({
+        apiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+        version: "weekly",
+        libraries: ["places"],
+      }),
+    []
+  );
+
   useEffect(() => {
     if (org === null) {
       navigate("/");
@@ -36,12 +42,14 @@ function OrgView({ logged, setLogged, userID, org }) {
         if (response.status === "success") {
           setReviews(response.reviews);
           setPageCount(Math.ceil(response.reviews.length / pageSize));
-          setavgRating(
-            response.reviews.reduce(
-              (total, review) => total + review.rating,
-              0
-            ) / response.reviews.length
-          );
+          if (response.reviews.length !== 0) {
+            setavgRating(
+              response.reviews.reduce(
+                (total, review) => total + review.rating,
+                0
+              ) / response.reviews.length
+            );
+          }
         } else {
           //Error Handling
         }
@@ -92,13 +100,13 @@ function OrgView({ logged, setLogged, userID, org }) {
             </div>
           </div>
           <div className="d-flex flex-column">
-            <div>
+            <div className="d-flex">
               <GoLocation />
-              {org.address}
+              <div>{org.address}</div>
             </div>
-            <div>
+            <div className="d-flex">
               <BsTelephoneFill />
-              {org.phone}
+              <div>{org.phone}</div>
             </div>
             <div>
               <GoGlobe />

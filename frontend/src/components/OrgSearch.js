@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "./css/OrgSearch.css";
 import initMap from "./js/OrgSearch";
 import { Loader } from "@googlemaps/js-api-loader";
@@ -11,11 +11,15 @@ function OrgSearch({ org, setOrg }) {
   const [placeID, setPlaceID] = useState(null);
   const [map, setMap] = useState(null);
 
-  const loader = new Loader({
-    apiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY,
-    version: "weekly",
-    libraries: ["places"],
-  });
+  const loader = useMemo(
+    () =>
+      new Loader({
+        apiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+        version: "weekly",
+        libraries: ["places"],
+      }),
+    []
+  );
 
   useEffect(() => {
     if (map && "geolocation" in navigator) {
@@ -53,8 +57,10 @@ function OrgSearch({ org, setOrg }) {
   const getOrganization = async () => {
     if (placeID) {
       const response = await fetchOrganization(placeID);
-      if (response.status == "success") {
+      if (response.status === "success") {
         setOrg(response.placeDetails);
+      } else if (response.status === "unauthorized") {
+        //Error handling
       } else {
         //Error Handling
       }
@@ -90,6 +96,9 @@ function OrgSearch({ org, setOrg }) {
         <span id="place-name" className="title"></span>
         <br />
         <span id="place-address"></span>
+        <button className="btn btn-link" onClick={getOrganization}>
+          View Organization
+        </button>
       </div>
     </div>
   );

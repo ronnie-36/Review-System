@@ -15,8 +15,14 @@ export const fetchOrganization = async (place_id) => {
   returnValue = await fetch(url, options)
     .then((response) => response.json())
     .then((response) => {
-      console.log(response);
-      return { status: "success", placeDetails: response };
+      if (response === "Org Not Found") {
+        return {
+          status: "unauthorized",
+          message: "Org not found in DB Login to add the organization",
+        };
+      } else {
+        return { status: "success", placeDetails: response };
+      }
     })
     .catch((error) => {
       console.log(error);

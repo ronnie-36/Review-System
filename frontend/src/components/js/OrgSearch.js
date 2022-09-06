@@ -1,3 +1,30 @@
+const fields = [
+  "accounting",
+  "airport",
+  "lawyer",
+  "library",
+  "light_rail_station",
+  "university",
+  "hospital",
+  "subway_station",
+  "fire_station",
+  "embassy",
+  "secondary_school",
+  "school",
+  "courthouse",
+  "primary_school",
+  "post_office",
+  "city_hall",
+  "police",
+  "pharmacy",
+  "park",
+  "museum",
+  "bus_station",
+  "bank",
+  "atm",
+  "local_government_office",
+];
+
 export default function initMap(google, setPlaceID) {
   const map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 22.520657021229354, lng: 75.92093767747048 },
@@ -25,25 +52,80 @@ export default function initMap(google, setPlaceID) {
 
   infowindow.setContent(infowindowContent);
 
-  const marker = new google.maps.Marker({ map: map });
+  let markers = [];
 
-  marker.addListener("click", () => {
-    infowindow.open(map, marker);
+  function callback(results, status) {
+    console.log(results);
+    markers.forEach((marker) => marker.setMap(null));
+    markers = [];
+    // console.log(results);
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      results.forEach((result) => {
+        //console.log(result);
+        let marker = new google.maps.Marker({
+          position: result.geometry.location,
+          map,
+        });
+        markers.push(marker);
+        marker.setVisible(true);
+
+        marker.addListener("click", () => {
+          //console.log(e);
+          infowindowContent.children.namedItem("place-name").textContent =
+            result.name;
+          if (result.plus_code) {
+            infowindowContent.children.namedItem("place-address").textContent =
+              result.plus_code.compound_code;
+          }
+          infowindow.open(map, marker);
+          setPlaceID(result.place_id);
+        });
+      });
+    }
+  }
+
+  let i = 0;
+
+  map.addListener("center_changed", () => {
+    if (i > 0) {
+      return;
+    }
+    if (markers.some((marker) => marker.position === map.getCenter())) {
+      return;
+    }
+    i++;
+    let request = {
+      location: map.getCenter(),
+      radius: "200",
+    };
+    const service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, callback);
   });
 
+  if (markers.some((marker) => marker.position === map.getCenter())) {
+    return;
+  }
+
+  let request = {
+    location: map.getCenter(),
+    radius: "200",
+  };
+
+  const service = new google.maps.places.PlacesService(map);
+  service.nearbySearch(request, callback);
+
   map.addListener("click", (place) => {
-    console.log(place);
-    if (place.placeId) {
-      map.setCenter(place.latLng);
-      map.setZoom(13);
-      marker.setPlace({
-        placeId: place.placeId,
-        location: place.latLng,
-      });
-      setPlaceID(place.placeId);
+    if (markers.some((marker) => marker.position === place.latLng)) {
+      return;
     }
 
-    marker.setVisible(true);
+    let request = {
+      location: place.latLng,
+      radius: "200",
+    };
+
+    const service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, callback);
   });
 
   autocomplete.addListener("place_changed", () => {
@@ -62,21 +144,17 @@ export default function initMap(google, setPlaceID) {
       map.setZoom(14);
     }
 
-    // Set the position of the marker using the place ID and location.
-    // @ts-ignore This should be in @typings/googlemaps.
-    marker.setPlace({
-      placeId: place.place_id,
+    let request = {
       location: place.geometry.location,
-    });
+      radius: "200",
+      fields: fields,
+    };
 
-    setPlaceID(place.place_id);
+    console.log(place);
+    //setPlaceID();
 
-    marker.setVisible(true);
-
-    infowindowContent.children.namedItem("place-name").textContent = place.name;
-    infowindowContent.children.namedItem("place-address").textContent =
-      place.formatted_address;
-    infowindow.open(map, marker);
+    const service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, callback);
   });
 
   return map;
