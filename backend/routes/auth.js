@@ -3,7 +3,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import registerService from "../services/registerService.js";
 import verifyPhoneService from "../services/verifyPhoneService.js";
-import { optionalJwtAuth } from "../middleware/auth.js";
+import { optionalJwtAuth, requireJwtAuth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 
 let router = express.Router();
@@ -179,6 +179,14 @@ router.get("/logout", (req, res, next) => {
   res.clearCookie("jwt");
   res.status(200);
   res.json({ status: "success", message: "Logged Out successfully" });
+  return res.end();
+});
+
+// @desc    Check if user logged in or not
+// @route   /auth/check
+router.get("/check", requireJwtAuth, (req, res, next) => {
+  res.status(200);
+  res.json(req.user);
   return res.end();
 });
 
