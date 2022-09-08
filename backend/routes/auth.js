@@ -34,14 +34,15 @@ router.get(
     );
     res.cookie("jwt", token);
     if (req.user.phone == "") {
-      res.redirect("http://localhost:3000/addphone");
-    } else {
-      res.redirect("http://localhost:3000/");
+      res.redirect(`${process.env.FRONTEND_LINK}/addphone`);
+    }
+    else {
+      res.redirect(`${process.env.FRONTEND_LINK}/`);
     }
   }
 );
 
-// @desc    Add user's phone
+// @desc    Send OTP
 // @route   /auth/phone
 router.post("/phone", optionalJwtAuth, async function (req, res, next) {
   try {
@@ -49,9 +50,17 @@ router.post("/phone", optionalJwtAuth, async function (req, res, next) {
     var format = /[ `!@#$%^&*()_\-=\[\]{};':"\\|,.<>\/?~]/;
     if (format.test(phone) || phone == "") {
       res.clearCookie("jwt");
-      return res.redirect("http://localhost:3000/");
+      return res.redirect(`${process.env.FRONTEND_LINK}/`);
     }
     if (req.user && req.user.phone != "") {
+      res.status(200);
+      res.json({
+        status: "error",
+        message: "User already has a phone registered.",
+      });
+      return res.end();
+    }
+    else {
       let verificationRequest = await verifyPhoneService.sendOTP(phone);
       if (verificationRequest.status == "pending") {
         res.status(200);
@@ -61,25 +70,13 @@ router.post("/phone", optionalJwtAuth, async function (req, res, next) {
         });
         return res.end();
       }
-      // res.status(404);
-      // res.json({
-      //   status: "error",
-      //   message: "Check the mobile number",
-      //   error: "User does not exist with this mobile number",
-      // });
-      // return res.end();
-    } else {
-      let verificationRequest = await verifyPhoneService.sendOTP(phone);
-      if (verificationRequest.status == "pending") {
+      else {
         res.status(200);
         res.json({
-          user: req.user,
-          status: "success",
-          message: "OTP sent successfully",
+          status: "error",
+          message: "OTP send failed.",
         });
         return res.end();
-      } else {
-        res.redirect("back"); // TODO: some error message
       }
     }
   } catch (e) {
@@ -87,49 +84,58 @@ router.post("/phone", optionalJwtAuth, async function (req, res, next) {
   }
 });
 
-// @desc    Add user's phone
+// @desc    Verify OTP And Add Phone
 // @route   /auth/phone/verifyOTP
-// register new user
-router.post(
-  "/phone/verifyOTP",
-  optionalJwtAuth,
-  async function (req, res, next) {
-    try {
-      const { phone, otp } = req.body;
-      var format = /\d{6}/;
-      if (!format.test(otp) || otp == "") {
-        res.clearCookie("jwt");
-        res.status(401);
-        res.json({
-          status: "error",
-          message: "Wrong OTP",
-          error: "The OTP submitted is wrong",
-        });
-        return res.end();
+router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next) {
+  try {
+    const { phone, otp } = req.body;
+    var format = /\d{6}/;
+    if (!format.test(otp) || otp == "") {
+      res.clearCookie("jwt");
+      res.status(401);
+      res.json({
+        status: "error",
+        message: "Wrong OTP",
+        error: "The OTP submitted is wrong",
+      });
+      return res.end();
+    }
+    let verificationResult = await verifyPhoneService.verifyOTP(phone, otp);
+    if (verificationResult.status === "approved") {
+      if (!req.user) {
+        let user = await registerService.checkExistPhone(phone);
+        if (!user) {
+          user = await registerService.createNewUser({
+            id: uuidv4(),
+            phone: phone,
+            email: "",
+          });
+        }
+        let token = jwt.sign(
+          {
+            id: user.id,
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+        res.cookie("jwt", token);
       }
-      let verificationResult = await verifyPhoneService.verifyOTP(phone, otp);
-      if (verificationResult.status === "approved") {
-        if (!req.user) {
-          let user = await registerService.checkExistPhone(phone);
-          if (!user) {
-            user = await registerService.createNewUser({
-              id: uuidv4(),
-              phone: phone,
-              email: "",
+      else {
+        let existUser = await registerService.checkExistPhone(phone);
+        if (existUser) {
+          // TODO: can think of other implementation
+          if (existUser.email) {
+            registerService.deleteUser(req.user.id);
+            res.clearCookie("jwt");
+            res.status(401);
+            res.json({
+              status: "error",
+              message: "Phone number exists.",
+              error: "User with this phone already exists!",
             });
+            return res.end();
           }
-          let token = jwt.sign(
-            {
-              id: user.id,
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-          );
-          res.cookie("jwt", token);
-        } else {
-          let existUser = await registerService.checkExistPhone(phone);
-          if (existUser) {
-            // TODO: can think of other implementation
+          else {
             registerService.update(
               {
                 email: req.user.email,
@@ -148,29 +154,32 @@ router.post(
               { expiresIn: "1h" }
             );
             res.cookie("jwt", token);
-          } else {
-            await registerService.update({ phone: phone }, req.user.id);
           }
         }
-        res.status(200);
-        res.json({
-          status: "success",
-          message: "User Authenticated successfully",
-        });
-        return res.end();
-      } else {
-        res.status(401);
-        res.json({
-          status: "error",
-          message: "Wrong OTP",
-          error: "The OTP submitted is wrong",
-        });
-        return res.end();
+        else {
+          await registerService.update({ phone: phone }, req.user.id);
+        }
       }
-    } catch (e) {
-      next(e);
+      res.status(200);
+      res.json({
+        status: "success",
+        message: "User Authenticated successfully",
+      });
+      return res.end();
     }
+    else {
+      res.status(401);
+      res.json({
+        status: "error",
+        message: "Wrong OTP",
+        error: "The OTP submitted is wrong",
+      });
+      return res.end();
+    }
+  } catch (e) {
+    next(e);
   }
+}
 );
 
 // @desc    Logout user

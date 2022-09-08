@@ -6,7 +6,7 @@ function ensureLoggedIn(options) {
   }
   options = options || {};
 
-  var url = options.redirectTo || "http://localhost:3000/login";
+  var url = options.redirectTo || `${process.env.FRONTEND_LINK}/login`;
   var setReturnTo =
     options.setReturnTo === undefined ? false : options.setReturnTo;
   var phoneCheck = options.phoneCheck === undefined ? true : options.phoneCheck;
@@ -38,7 +38,7 @@ function ensureLoggedOut(options) {
   }
   options = options || {};
 
-  var url = options.redirectTo || "http://localhost:3000/";
+  var url = options.redirectTo || `${process.env.FRONTEND_LINK}/`;
 
   return function (req, res, next) {
     return passport.authenticate(

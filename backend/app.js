@@ -17,7 +17,7 @@ import passportConfig from "./middleware/passport.js";
 let app = express();
 
 let corsOptions = {
-  origin: "http://localhost:3000",
+  origin: `${process.env.FRONTEND_LINK}`,
   optionsSuccessStatus: 200,
   credentials: true,
 };
