@@ -24,6 +24,7 @@ function ModalImage({ image }) {
           src={image.url}
           key={image.id}
         />
+        <p style={{ textAlign: "center" }}>{image.caption}</p>
       </Modal>
     </>
   );

@@ -1,104 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import StarRatings from "react-star-ratings";
 import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
+import { toast } from "react-toastify";
 
 import "./css/OrgView.css";
 import Review from "../components/Review";
 import NewReview from "../components/NewReview";
-import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
 import Header from "../components/Header";
+import { fetchReviewsByOrg } from "../apiHelpers/review";
+import { Loader } from "@googlemaps/js-api-loader";
+import initMap from "./js/orgMap";
 
-const org = {
-  image: "/logo192.png",
-  avgRating: 4.25,
-  address: "IIT indore",
-  phone: "+919010202398",
-  website: "https://www.google.com",
-  email: "sample@gmail.com",
-  reviews: [
-    {
-      id: 1,
-      author: "user 1.2.3",
-      text: "text",
-      rating: 2,
-      videos: [
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          id: 1,
-        },
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-          id: 2,
-        },
-      ],
-      images: [
-        {
-          url: "https://picsum.photos/500/300",
-          id: 1,
-        },
-        {
-          url: "https://picsum.photos/400/300",
-          id: 2,
-        },
-      ],
-      audios: [
-        {
-          url: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
-          id: 1,
-        },
-        {
-          url: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
-          id: 2,
-        },
-      ],
-    },
-    {
-      id: 2,
-      author: "someone not user",
-      text: "I enjoyed the services a lot",
-      rating: 4,
-      videos: [
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          id: 1,
-        },
-        {
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-          id: 2,
-        },
-      ],
-      images: [
-        {
-          url: "https://picsum.photos/300/300",
-          id: 1,
-        },
-        {
-          url: "https://picsum.photos/400/400",
-          id: 2,
-        },
-      ],
-      audios: [],
-    },
-  ],
-};
-
-function OrgView({ logged, setLogged }) {
+function OrgView({ logged, setLogged, userID, org }) {
   const [addSection, setAddSection] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
+  const [reviews, setReviews] = useState([]);
+  const [avgRating, setavgRating] = useState(0);
 
   const pageSize = 5;
+  const navigate = useNavigate();
+
+  const loader = useMemo(
+    () =>
+      new Loader({
+        apiKey: process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+        version: "weekly",
+        libraries: ["places"],
+      }),
+    []
+  );
 
   useEffect(() => {
-    setPageCount(Math.ceil(org.reviews.length / pageSize));
-  }, []);
+    if (org === null) {
+      navigate("/");
+    } else {
+      (async function () {
+        const response = await fetchReviewsByOrg(org.orgID);
+        if (response.status === "success") {
+          setReviews(response.reviews);
+          setPageCount(Math.ceil(response.reviews.length / pageSize));
+          if (response.reviews.length !== 0) {
+            setavgRating(
+              response.reviews.reduce(
+                (total, review) => total + review.rating,
+                0
+              ) / response.reviews.length
+            );
+          }
+        } else {
+          toast.error("Unable to fetch reviews");
+        }
+      })();
+
+      (async () => {
+        await loader
+          .load()
+          .then((google) => {
+            // new google.maps.Map(document.getElementById("map"), mapOptions);
+            initMap(google, org.loc_lat, org.loc_long);
+          })
+          .catch((err) => {
+            toast.error("Unable to Load Map");
+          });
+      })();
+    }
+  }, [org, addSection, navigate, loader]);
 
   const handleClick = (e, index) => {
     e.preventDefault();
     setCurrentPage(index);
   };
-
+  if (!org) {
+    return <></>;
+  }
   return (
     <div className="min-vh-100">
       <Header logged={logged} setLogged={setLogged} />
@@ -107,30 +85,29 @@ function OrgView({ logged, setLogged }) {
           style={{ minHeight: "10rem" }}
           className="w-100 flex-wrap d-flex container-fluid org-dets align-items-center"
         >
-          <img src={org.image} alt="Organization Logo" className="mh-100" />
           <div className="">
-            <div className="fs-1 fw-bold">Organization Name</div>
+            <div className="fs-5 fw-bold">{org.name}</div>
             <div className="d-flex align-items-center">
               <StarRatings
-                rating={org.avgRating}
+                rating={avgRating}
                 numberOfStars={5}
                 starRatedColor="rgb(253,204,13)"
                 starDimension="1rem"
               />
               <div className="d-flex ms-2 mt-3 align-items-end">
-                <p className="fs-3 fst-italic ">{org.avgRating}</p>
+                <p className="fs-3 fst-italic ">{avgRating}</p>
                 <p className="fs-4 fst-italic">/5</p>
               </div>
             </div>
           </div>
-          <div className="d-flex flex-column">
-            <div>
+          <div className="d-flex flex-column small-dets">
+            <div className="d-flex">
               <GoLocation />
-              {org.address}
+              <div>{org.address}</div>
             </div>
-            <div>
+            <div className="d-flex">
               <BsTelephoneFill />
-              {org.phone}
+              <div>{org.phone}</div>
             </div>
             <div>
               <GoGlobe />
@@ -145,9 +122,10 @@ function OrgView({ logged, setLogged }) {
             </div>
             <div>
               <GoMail />
-              {org.email}
+              {org.email ? org.email : "NA"}
             </div>
           </div>
+          <div id="static-map"></div>
         </div>
       </div>
       <div className="d-flex flex-column align-items-center">
@@ -162,61 +140,76 @@ function OrgView({ logged, setLogged }) {
           <div
             role="button"
             className={`fw-bold section p-2 ${!addSection ? "" : "selected"}`}
-            onClick={() => setAddSection(true)}
+            onClick={() => {
+              if (logged) setAddSection(true);
+              else {
+                toast.error("Log in to add a review", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
+              }
+            }}
           >
             Add Review
           </div>
         </div>
         {!addSection ? (
-          <>
-            <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
-              {org.reviews
-                .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                .map((value) => {
-                  return <Review key={value.id} review={value} />;
-                })}
-            </div>
-            <Pagination aria-label="Page navigation example">
-              <PaginationItem disabled={currentPage <= 0}>
-                <PaginationLink
-                  onClick={(e) => handleClick(e, 0)}
-                  first
-                  href="#"
-                />
-              </PaginationItem>
-              <PaginationItem disabled={currentPage <= 0}>
-                <PaginationLink
-                  onClick={(e) => handleClick(e, currentPage - 1)}
-                  previous
-                  href="#"
-                />
-              </PaginationItem>
-              {[...Array(pageCount)].map((_, i) => (
-                <PaginationItem active={i === currentPage} key={i}>
-                  <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem disabled={currentPage >= pageCount - 1}>
-                <PaginationLink
-                  onClick={(e) => handleClick(e, currentPage + 1)}
-                  next
-                  href="#"
-                />
-              </PaginationItem>
-              <PaginationItem disabled={currentPage >= pageCount - 1}>
-                <PaginationLink
-                  onClick={(e) => handleClick(e, 0)}
-                  last
-                  href="#"
-                />
-              </PaginationItem>
-            </Pagination>
-          </>
+          <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
+            {reviews
+              .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+              .map((value) => {
+                return <Review key={value.reviewID} review={value} />;
+              })}
+          </div>
+        ) : logged ? (
+          <NewReview org={org} userID={userID} setAddSection={setAddSection} />
         ) : (
-          <NewReview />
+          <div>Please Log in first to add a review</div>
+        )}
+        {!addSection && reviews.length !== 0 && (
+          <Pagination aria-label="Page navigation example">
+            <PaginationItem disabled={currentPage <= 0}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, 0)}
+                first
+                href="#"
+              />
+            </PaginationItem>
+            <PaginationItem disabled={currentPage <= 0}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, currentPage - 1)}
+                previous
+                href="#"
+              />
+            </PaginationItem>
+            {[...Array(pageCount)].map((_, i) => (
+              <PaginationItem active={i === currentPage} key={i}>
+                <PaginationLink onClick={(e) => handleClick(e, i)} href="#">
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem disabled={currentPage >= pageCount - 1}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, currentPage + 1)}
+                next
+                href="#"
+              />
+            </PaginationItem>
+            <PaginationItem disabled={currentPage >= pageCount - 1}>
+              <PaginationLink
+                onClick={(e) => handleClick(e, 0)}
+                last
+                href="#"
+              />
+            </PaginationItem>
+          </Pagination>
         )}
       </div>
     </div>

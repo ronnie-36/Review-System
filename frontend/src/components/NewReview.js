@@ -4,8 +4,10 @@ import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import Dropzone from "react-dropzone-uploader";
 import StarRatings from "react-star-ratings";
 import PreviewMedia from "./PreviewMedia";
+import { getSignedURL, postReview, uploadToAWS } from "../apiHelpers/review";
+import { toast } from "react-toastify";
 
-function NewReview() {
+function NewReview({ org, setAddSection }) {
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
@@ -28,10 +30,96 @@ function NewReview() {
     return true;
   };
 
-  const submitReview = () => {
+  const submitReview = async () => {
     console.log(newReview);
-    if (newReview.text.length > 20) {
+    if (newReview.text.length > 200) {
       setError(true);
+    }
+
+    let review = {
+      text: newReview.text,
+      rating: newReview.rating,
+      org: org.orgID,
+      images: [], //{name:"",caption:""}
+      videos: [],
+      audios: [],
+    };
+
+    for (const image of newReview.images) {
+      const response = await getSignedURL("image");
+      console.log(response);
+      if (response.status === "success") {
+        const filename = response.filename;
+        const signedURL = response.url;
+        const uploadStatus = await uploadToAWS(signedURL, image.file);
+        if (uploadStatus.status === "success") {
+          review.images.push({ name: filename, caption: image.caption });
+        } else {
+          toast.error("Unable to upload images");
+          return;
+        }
+      } else {
+        toast.error("Unable to upload images");
+        return;
+      }
+    }
+
+    for (const video of newReview.videos) {
+      const response = await getSignedURL("video");
+      console.log(response);
+      if (response.status === "success") {
+        const filename = response.filename;
+        const signedURL = response.url;
+
+        const uploadStatus = await uploadToAWS(signedURL, video.file);
+
+        if (uploadStatus.status === "success") {
+          review.videos.push({ name: filename, caption: video.caption });
+        } else {
+          toast.error("Unable to upload videos");
+          return;
+        }
+      } else {
+        toast.error("Unable to upload videos");
+        return;
+      }
+    }
+
+    for (const audio of newReview.audios) {
+      const response = await getSignedURL("video");
+      console.log(response);
+      if (response.status === "success") {
+        const filename = response.filename;
+        const signedURL = response.url;
+
+        const uploadStatus = await uploadToAWS(signedURL, audio.file);
+
+        if (uploadStatus.status === "success") {
+          review.audios.push({ name: filename, caption: audio.caption });
+        } else {
+          toast.error("Unable to upload audios");
+          return;
+        }
+      } else {
+        toast.error("Unable to upload audios");
+        return;
+      }
+    }
+
+    const response = await postReview(review);
+
+    if (response.status === "success") {
+      setNewReview({
+        rating: 0,
+        text: "",
+        videos: [],
+        images: [],
+        audios: [],
+      });
+      toast.success("Review added successfully");
+      setAddSection(false);
+    } else {
+      toast.error("unable to add the review");
     }
   };
 
@@ -53,7 +141,7 @@ function NewReview() {
       } else if (audioPattern.test(file.type)) {
         const newFile = { id: meta.id, meta: meta, file: file, caption: "" };
         setNewReview((oldReview) => {
-          return { ...oldReview, videos: [...oldReview.audios, newFile] };
+          return { ...oldReview, audios: [...oldReview.audios, newFile] };
         });
       }
     } else if (status === "removed") {

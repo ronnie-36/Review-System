@@ -3,26 +3,35 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Cookies from "js-cookie";
 import jwt_decode from "jwt-decode";
+import "react-toastify/dist/ReactToastify.css";
 
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-// import SignUp from "./pages/SignUp";
 import OrgView from "./pages/OrgView";
 import UserDetails from "./pages/UserDetails";
 import AddPhone from "./pages/AddPhone";
+import { checkLogin } from "./apiHelpers/authentication";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const [logged, setLogged] = useState(false);
-  const [userID, setUserID] = useState("");
+  const [userID, setUserID] = useState(null);
+  const [org, setOrg] = useState(null);
 
   useEffect(() => {
     const cookie = Cookies.get();
     if (cookie.jwt) {
       const decoded = jwt_decode(cookie.jwt);
-      console.log(decoded);
       if (decoded && decoded.id) {
-        setLogged(true);
-        setUserID(decoded.id);
+        (async () => {
+          const response = await checkLogin();
+          if (response.status !== "success") {
+            setLogged(false);
+          } else {
+            setLogged(true);
+            setUserID(decoded.id);
+          }
+        })();
       } else {
         setLogged(false);
       }
@@ -34,11 +43,18 @@ function App() {
   return (
     <>
       <Router basename="/">
+        <ToastContainer />
         <Routes>
           <Route
             path="/"
             element={
-              <Home logged={logged} setLogged={setLogged} userID={userID} />
+              <Home
+                logged={logged}
+                setLogged={setLogged}
+                userID={userID}
+                org={org}
+                setOrg={setOrg}
+              />
             }
           />
           <Route
@@ -53,11 +69,15 @@ function App() {
               <AddPhone logged={logged} setLogged={setLogged} userID={userID} />
             }
           />
-          {/* <Route path="/signup" element={<SignUp />} /> */}
           <Route
             path="/orgview"
             element={
-              <OrgView logged={logged} setLogged={setLogged} userID={userID} />
+              <OrgView
+                logged={logged}
+                setLogged={setLogged}
+                userID={userID}
+                org={org}
+              />
             }
           />
           <Route

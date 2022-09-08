@@ -6,6 +6,7 @@ import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { sendOTPMobile, verifyMobileOTP } from "../apiHelpers/authentication";
+import { toast } from "react-toastify";
 
 function AddPhone() {
   const [user, setUser] = useState({ mobile: "", id: null });
@@ -19,7 +20,6 @@ function AddPhone() {
 
   useEffect(() => {
     if (OTPTimer && OTPTimer < 0) {
-      console.log(OTPTimer);
       clearInterval(clearTimer);
       setClearTimer(null);
       setOTPTimer(null);
@@ -36,16 +36,17 @@ function AddPhone() {
     const validMobile = isValidPhoneNumber(user.mobile);
 
     if (validMobile && !OTPTimer) {
-      console.log(user.mobile);
       const response = await sendOTPMobile(user.mobile);
-      console.log(response);
       if (response.status === "success") {
         setUser({ ...user, id: response.user });
         setOTPSent(true);
         setOTPTimer(120);
+      } else {
+        toast.error("Unable to send OTP");
       }
     }
     if (!validMobile) {
+      toast.warn("Please enter a valid mobile number");
       setErrors({ ...errors, mobile: "Please enter a Valid Mobile Number" });
     }
   }
@@ -56,6 +57,7 @@ function AddPhone() {
     if (response.status === "success") {
       navigate("/");
     } else if (response.status === "error") {
+      toast.error("Wrong OTP");
       setErrors({ ...errors, mobile: "Wrong OTP" });
     }
   }
