@@ -144,15 +144,18 @@ let getReviews = (id, type) => {
     return new Promise(async (resolve, reject) => {
         try {
             let query = {};
+            let table = "";
             if (type == "user") {
+                table = "review";
                 query = { 'author': id };
             }
             else if (type == "org") {
+                table = "review JOIN Organization ON review.org = Organization.orgID";
                 query = { 'org': id };
             }
             let reviews = [];
             DBConnection.query(
-                ' SELECT * FROM review WHERE ? ', query,
+                ` SELECT * FROM ${table} WHERE ? `, query,
                 async function (err, rows) {
                     if (err) {
                         throw (err);
