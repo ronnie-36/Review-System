@@ -45,7 +45,7 @@ export const sendOTPMobile = async (mobile) => {
       return response;
     })
     .catch((err) => {
-      returnValue = { status: "error", message: { ...error } };
+      returnValue = { status: "error", message: { ...err } };
       console.log(err); //TODO : Something for errors
     });
 

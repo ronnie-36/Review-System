@@ -60,8 +60,16 @@ export default function initMap(google, setPlaceID) {
     // console.log(results);
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       results.forEach((result) => {
+        const image = {
+          url: result.icon,
+          size: new google.maps.Size(71, 71),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(17, 34),
+          scaledSize: new google.maps.Size(25, 25),
+        };
         //console.log(result);
         let marker = new google.maps.Marker({
+          icon: image,
           position: result.geometry.location,
           map,
         });
