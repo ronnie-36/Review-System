@@ -7,7 +7,6 @@ import "./css/Review.css";
 import { parseTime } from "./js/utils";
 
 function Review({ review }) {
-  //console.log(review);
   return (
     <div className="review p-5">
       <div className="fw-bold">{review.author}</div>

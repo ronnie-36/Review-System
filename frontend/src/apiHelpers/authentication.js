@@ -1,5 +1,27 @@
 const rooturl = "http://localhost:5000/";
 
+export const checkLogin = async () => {
+  const url = rooturl + "auth/check";
+
+  const options = {
+    method: "GET",
+    credentials: "include",
+  };
+  let returnValue;
+  await fetch(url, options)
+    .then((response) => {
+      if (response.status === 401) {
+        returnValue = { status: "error", message: "unauthorised" };
+      } else if (response.status === 200) {
+        returnValue = { status: "success", message: "authorised" };
+      }
+    })
+    .catch((error) => {
+      returnValue = { status: "error", message: { ...error } };
+    });
+  return returnValue;
+};
+
 export const loginWithGoogle = async () => {
   const url = rooturl + "auth/google";
   window.open(url, "_self");
@@ -23,6 +45,7 @@ export const sendOTPMobile = async (mobile) => {
       return response;
     })
     .catch((err) => {
+      returnValue = { status: "error", message: { ...error } };
       console.log(err); //TODO : Something for errors
     });
 
@@ -39,16 +62,17 @@ export const verifyMobileOTP = async (mobile, otp, id) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   };
-
-  return await fetch(url, options)
+  let returnValue;
+  await fetch(url, options)
     .then((response) => response.json())
     .then((response) => {
-      console.log(response);
-      return response;
+      returnValue = response;
     })
     .catch((err) => {
+      returnValue = { status: "error", message: { ...err } };
       console.log(err); //TODO : Something for errors
     });
+  return returnValue;
 };
 
 export const logout = async () => {
@@ -58,7 +82,5 @@ export const logout = async () => {
     credentials: "include",
   };
 
-  return await fetch(url, options)
-    .then((response) => response.json())
-    .catch((err) => err);
+  return await fetch(url, options).then((response) => response.json());
 };

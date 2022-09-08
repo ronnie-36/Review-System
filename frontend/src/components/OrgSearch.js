@@ -2,10 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import "./css/OrgSearch.css";
 import initMap from "./js/OrgSearch";
 import { Loader } from "@googlemaps/js-api-loader";
-import { Button } from "reactstrap";
 import { fetchOrganization } from "../apiHelpers/org";
 import { Navigate } from "react-router-dom";
-// import "dotenv/config";
+import { toast } from "react-toastify";
 
 function OrgSearch({ org, setOrg }) {
   const [placeID, setPlaceID] = useState(null);
@@ -40,11 +39,10 @@ function OrgSearch({ org, setOrg }) {
         const tempMap = await loader
           .load()
           .then((google) => {
-            // new google.maps.Map(document.getElementById("map"), mapOptions);
             return initMap(google, setPlaceID);
           })
           .catch((err) => {
-            console.log(err);
+            toast.warn("Unable to load map");
           });
 
         if (tempMap) {
@@ -60,12 +58,14 @@ function OrgSearch({ org, setOrg }) {
       if (response.status === "success") {
         setOrg(response.placeDetails);
       } else if (response.status === "unauthorized") {
-        //Error handling
+        toast.warn(
+          "Organization does not exist in our database Login to add Organization"
+        );
       } else {
-        //Error Handling
+        toast.error("Unable to fetch organization details");
       }
     } else {
-      console.log("Select a organization");
+      toast.error("Please select an organization");
     }
   };
 
@@ -82,14 +82,6 @@ function OrgSearch({ org, setOrg }) {
           type="text"
           placeholder="Enter an Organization"
         />
-        <Button
-          onClick={getOrganization}
-          id="submitPlace"
-          className="text-wrap"
-          color="primary"
-        >
-          View the organization
-        </Button>
       </div>
       <div id="map"></div>
       <div id="infowindow-content">

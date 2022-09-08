@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../apiHelpers/authentication";
 import { Nav, NavLink, NavItem, NavbarBrand, Navbar } from "reactstrap";
 import "./css/Header.css";
+import { toast } from "react-toastify";
 
 function Header({ logged, setLogged }) {
   const navigate = useNavigate();
@@ -12,8 +13,9 @@ function Header({ logged, setLogged }) {
     if (response.status === "success") {
       setLogged(false);
       navigate("/");
+      toast.success("Logged Out successfully");
     } else {
-      //TODO: handle Error
+      toast.error("Unable to Logout");
     }
   };
 
@@ -22,7 +24,9 @@ function Header({ logged, setLogged }) {
       style={{ backgroundColor: "rgb(58, 172, 203)" }}
       className="navbar__homepage"
     >
-      <NavbarBrand href="/">Review System</NavbarBrand>
+      <NavbarBrand href="/" className="me-auto">
+        Review System
+      </NavbarBrand>
       <Nav className="ml-auto" navbar>
         <NavItem
           style={{

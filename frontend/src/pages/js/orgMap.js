@@ -7,7 +7,7 @@ export default function initMap(google, lat, lang) {
     fullscreenControl: false,
   });
 
-  const marker = new google.maps.Marker({
+  new google.maps.Marker({
     position: { lat: Number(lat), lng: Number(lang) },
     map: map,
   });

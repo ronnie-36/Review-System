@@ -28,13 +28,11 @@ function PreviewMedia({
   newReview,
   setNewReview,
 }) {
-  //console.log(status, canCancel);
   let title = `${name || "?"},`;
   if (duration) title = `${title},`;
 
   const [value, setValue] = useState("");
 
-  // console.log(dataType);
   const imagePattern = useMemo(() => /image\/\w+/, []),
     videoPattern = useMemo(() => /video\/\w+/, []),
     audioPattern = useMemo(() => /audio\/\w+/, []);
@@ -56,7 +54,6 @@ function PreviewMedia({
       setValue(temp);
     }
   }, [imagePattern, videoPattern, audioPattern, newReview, id, type]);
-  //console.log(dataType, newReview);
 
   function changeParentValue(e) {
     let index;

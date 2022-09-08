@@ -4,6 +4,7 @@ import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
+import { toast } from "react-toastify";
 
 import "./css/OrgView.css";
 import Review from "../components/Review";
@@ -51,7 +52,7 @@ function OrgView({ logged, setLogged, userID, org }) {
             );
           }
         } else {
-          //Error Handling
+          toast.error("Unable to fetch reviews");
         }
       })();
 
@@ -63,7 +64,7 @@ function OrgView({ logged, setLogged, userID, org }) {
             initMap(google, org.loc_lat, org.loc_long);
           })
           .catch((err) => {
-            console.log(err);
+            toast.error("Unable to Load Map");
           });
       })();
     }
@@ -99,7 +100,7 @@ function OrgView({ logged, setLogged, userID, org }) {
               </div>
             </div>
           </div>
-          <div className="d-flex flex-column">
+          <div className="d-flex flex-column small-dets">
             <div className="d-flex">
               <GoLocation />
               <div>{org.address}</div>
@@ -139,7 +140,20 @@ function OrgView({ logged, setLogged, userID, org }) {
           <div
             role="button"
             className={`fw-bold section p-2 ${!addSection ? "" : "selected"}`}
-            onClick={() => setAddSection(true)}
+            onClick={() => {
+              if (logged) setAddSection(true);
+              else {
+                toast.error("Log in to add a review", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
+              }
+            }}
           >
             Add Review
           </div>
@@ -152,8 +166,10 @@ function OrgView({ logged, setLogged, userID, org }) {
                 return <Review key={value.reviewID} review={value} />;
               })}
           </div>
-        ) : (
+        ) : logged ? (
           <NewReview org={org} userID={userID} setAddSection={setAddSection} />
+        ) : (
+          <div>Please Log in first to add a review</div>
         )}
         {!addSection && reviews.length !== 0 && (
           <Pagination aria-label="Page navigation example">

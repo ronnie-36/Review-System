@@ -5,12 +5,13 @@ import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { GoogleLoginButton } from "react-social-login-buttons";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   loginWithGoogle,
   sendOTPMobile,
   verifyMobileOTP,
 } from "../apiHelpers/authentication";
+import { toast } from "react-toastify";
 
 function Login() {
   const [mobile, setMobile] = useState("");
@@ -45,9 +46,11 @@ function Login() {
         console.log(mobile);
         setOTPTimer(120);
       } else {
+        toast.error("Unable to send OTP");
         setError(response.error);
       }
     } else {
+      toast.error("Please enter a valid mobile number");
       setError("Please enter a Valid Mobile Number");
     }
   }
@@ -60,8 +63,10 @@ function Login() {
   async function handleMobileLogin() {
     const response = await verifyMobileOTP(mobile, OTP);
     if (response.status === "success") {
+      toast.success("Logged in successfully");
       navigate("/");
     } else {
+      toast.error("Wrong OTP");
       setError("Wrong OTP");
     }
   }

@@ -23,6 +23,10 @@
     width: 25%;
 }
 
+.small-dets{
+    width: 40%;
+}
+
 @media screen and (max-width:700px) {
         .org-dets{
             justify-content: flex-start;
@@ -30,4 +34,11 @@
         #static-map{
             width:90%;
         }
+        
+}
+
+@media screen and (max-width:500px) {
+    .small-dets{
+        width: 100%
+    }
 }

@@ -5,6 +5,7 @@ import Dropzone from "react-dropzone-uploader";
 import StarRatings from "react-star-ratings";
 import PreviewMedia from "./PreviewMedia";
 import { getSignedURL, postReview, uploadToAWS } from "../apiHelpers/review";
+import { toast } from "react-toastify";
 
 function NewReview({ org, setAddSection }) {
   const [newReview, setNewReview] = useState({
@@ -54,11 +55,12 @@ function NewReview({ org, setAddSection }) {
         if (uploadStatus.status === "success") {
           review.images.push({ name: filename, caption: image.caption });
         } else {
-          // ErrorHandling
+          toast.error("Unable to upload images");
+          return;
         }
-        // await uploadToAWS
       } else {
-        //Error Handling
+        toast.error("Unable to upload images");
+        return;
       }
     }
 
@@ -74,10 +76,12 @@ function NewReview({ org, setAddSection }) {
         if (uploadStatus.status === "success") {
           review.videos.push({ name: filename, caption: video.caption });
         } else {
-          //Error Handling
+          toast.error("Unable to upload videos");
+          return;
         }
       } else {
-        //Error Handling
+        toast.error("Unable to upload videos");
+        return;
       }
     }
 
@@ -93,10 +97,12 @@ function NewReview({ org, setAddSection }) {
         if (uploadStatus.status === "success") {
           review.audios.push({ name: filename, caption: audio.caption });
         } else {
-          //Error Handling
+          toast.error("Unable to upload audios");
+          return;
         }
       } else {
-        //Error Handling
+        toast.error("Unable to upload audios");
+        return;
       }
     }
 
@@ -110,10 +116,10 @@ function NewReview({ org, setAddSection }) {
         images: [],
         audios: [],
       });
-
+      toast.success("Review added successfully");
       setAddSection(false);
     } else {
-      //Error Handling
+      toast.error("unable to add the review");
     }
   };
 

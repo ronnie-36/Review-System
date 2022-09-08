@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Input,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-} from "reactstrap";
-import { FaEdit } from "react-icons/fa";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
 
 import Review from "../components/Review";
 
@@ -15,28 +7,28 @@ import "./css/UserDetails.css";
 import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
 import { fetchReviewsByUser } from "../apiHelpers/review";
+import { toast } from "react-toastify";
 
 function UserDetails({ logged, setLogged, userID }) {
-  const [mobile, setMobile] = useState("");
-  const [email, setEmail] = useState("");
-  const [editMobile, setEditMobile] = useState(false);
-  const [editEmail, setEditEmail] = useState(false);
-  const [mobError, setMobError] = useState(false);
-  const [emailError, setEmailError] = useState(false);
-  const [newMobile, setNewMobile] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-  const [mobOTPSent, setMobOTPSent] = useState(false);
-  const [emailOTPSent, setEmailOTPSent] = useState(false);
-  const [mobOTPTimer, setMobOTPTimer] = useState(null);
-  const [emailOTPTimer, setEmailOTPTimer] = useState(null);
-  const [mobClearTimer, setMobClearTimer] = useState(null);
-  const [emailClearTimer, setEmailClearTimer] = useState(null);
+  // const [mobile, setMobile] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [editMobile, setEditMobile] = useState(false);
+  // const [editEmail, setEditEmail] = useState(false);
+  // const [mobError, setMobError] = useState(false);
+  // const [emailError, setEmailError] = useState(false);
+  // const [newMobile, setNewMobile] = useState("");
+  // const [newEmail, setNewEmail] = useState("");
+  // const [mobOTPSent, setMobOTPSent] = useState(false);
+  // const [emailOTPSent, setEmailOTPSent] = useState(false);
+  // const [mobOTPTimer, setMobOTPTimer] = useState(null);
+  // const [emailOTPTimer, setEmailOTPTimer] = useState(null);
+  // const [mobClearTimer, setMobClearTimer] = useState(null);
+  // const [emailClearTimer, setEmailClearTimer] = useState(null);
 
   const [reviews, setReviews] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
-  console.log(userID);
   const pageSize = 5;
   const navigate = useNavigate();
   useEffect(() => {
@@ -44,121 +36,121 @@ function UserDetails({ logged, setLogged, userID }) {
       navigate("/");
     } else {
       (async function () {
-        const response = await fetchReviewsByUser(userID);
+        const response = await fetchReviewsByUser();
         if (response.status === "success") {
           console.log(response.reviews);
           setReviews(response.reviews);
           setPageCount(Math.ceil(response.reviews.length / pageSize));
         } else {
-          //Error Handling
+          toast.error("Unable to fetch reviews");
         }
       })();
     }
 
-    setMobile("+9197054321");
-    setEmail("keelis@gmail.com");
-    if (mobOTPTimer && mobOTPTimer < 0) {
-      console.log(mobOTPTimer);
-      clearInterval(mobClearTimer);
-      setMobClearTimer(null);
-      setMobOTPTimer(null);
-    } else if (mobOTPTimer && mobClearTimer == null && mobOTPTimer > 0) {
-      const timeout = setInterval(
-        () => setMobOTPTimer((mobOTPTimer) => mobOTPTimer - 1),
-        1000
-      );
-      setMobClearTimer(timeout);
-    }
+    // setMobile("+9197054321");
+    // setEmail("keelis@gmail.com");
+    // if (mobOTPTimer && mobOTPTimer < 0) {
+    //   console.log(mobOTPTimer);
+    //   clearInterval(mobClearTimer);
+    //   setMobClearTimer(null);
+    //   setMobOTPTimer(null);
+    // } else if (mobOTPTimer && mobClearTimer == null && mobOTPTimer > 0) {
+    //   const timeout = setInterval(
+    //     () => setMobOTPTimer((mobOTPTimer) => mobOTPTimer - 1),
+    //     1000
+    //   );
+    //   setMobClearTimer(timeout);
+    // }
 
-    if (emailOTPTimer && emailOTPTimer < 0) {
-      console.log(emailOTPTimer);
-      clearInterval(emailClearTimer);
-      setEmailClearTimer(null);
-      setEmailOTPTimer(null);
-    } else if (emailOTPTimer && emailClearTimer == null && emailOTPTimer > 0) {
-      const timeout = setInterval(
-        () => setEmailOTPTimer((emailOTPTimer) => emailOTPTimer - 1),
-        1000
-      );
-      setEmailClearTimer(timeout);
-    }
-  }, [mobOTPTimer, mobClearTimer, emailOTPTimer, emailClearTimer, userID]);
+    // if (emailOTPTimer && emailOTPTimer < 0) {
+    //   console.log(emailOTPTimer);
+    //   clearInterval(emailClearTimer);
+    //   setEmailClearTimer(null);
+    //   setEmailOTPTimer(null);
+    // } else if (emailOTPTimer && emailClearTimer == null && emailOTPTimer > 0) {
+    //   const timeout = setInterval(
+    //     () => setEmailOTPTimer((emailOTPTimer) => emailOTPTimer - 1),
+    //     1000
+    //   );
+    //   setEmailClearTimer(timeout);
+    // }
+  }, [userID, navigate]);
 
   const handleClick = (e, index) => {
     e.preventDefault();
     setCurrentPage(index);
   };
 
-  function handleEmailChange(e) {
-    console.log(e);
-    setEmailError(false);
-    setNewEmail(e.target.value);
-    // setErrors({ ...errors, email: false });
-    // setUser({ ...user, email: e.target.value });
-  }
+  // function handleEmailChange(e) {
+  //   console.log(e);
+  //   setEmailError(false);
+  //   setNewEmail(e.target.value);
+  //   // setErrors({ ...errors, email: false });
+  //   // setUser({ ...user, email: e.target.value });
+  // }
 
-  function submitMobOTP() {
-    setEditMobile(false);
-    setNewMobile("");
-    setMobOTPSent(false);
-    setMobOTPTimer(null);
-    setMobClearTimer(null);
-  }
+  // function submitMobOTP() {
+  //   setEditMobile(false);
+  //   setNewMobile("");
+  //   setMobOTPSent(false);
+  //   setMobOTPTimer(null);
+  //   setMobClearTimer(null);
+  // }
 
-  function submitEmailOTP() {
-    setEditEmail(false);
-    setNewEmail("");
-    setEmailOTPSent(false);
-    setEmailOTPTimer(null);
-    setMobClearTimer(null);
-  }
+  // function submitEmailOTP() {
+  //   setEditEmail(false);
+  //   setNewEmail("");
+  //   setEmailOTPSent(false);
+  //   setEmailOTPTimer(null);
+  //   setMobClearTimer(null);
+  // }
 
-  function sendForMobOTP() {
-    if (isValidPhoneNumber(newMobile)) {
-      setMobOTPSent(true);
-      console.log(newMobile);
-      setMobOTPTimer(120);
-    } else {
-      setMobError(true);
-    }
-  }
+  // function sendForMobOTP() {
+  //   if (isValidPhoneNumber(newMobile)) {
+  //     setMobOTPSent(true);
+  //     console.log(newMobile);
+  //     setMobOTPTimer(120);
+  //   } else {
+  //     setMobError(true);
+  //   }
+  // }
 
-  function sendForEmailOTP() {
-    const validEmail = String(newEmail)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
+  // function sendForEmailOTP() {
+  //   const validEmail = String(newEmail)
+  //     .toLowerCase()
+  //     .match(
+  //       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  //     );
 
-    if (validEmail) {
-      setEmailOTPSent(true);
-      console.log(newEmail);
-      setEmailOTPTimer(120);
-    } else {
-      setEmailError(true);
-    }
-  }
+  //   if (validEmail) {
+  //     setEmailOTPSent(true);
+  //     console.log(newEmail);
+  //     setEmailOTPTimer(120);
+  //   } else {
+  //     setEmailError(true);
+  //   }
+  // }
 
-  function handleMobCancel() {
-    setEditMobile(false);
-    setNewMobile("");
-    setMobOTPSent(false);
-    setMobOTPTimer(null);
-    setMobClearTimer(null);
-  }
+  // function handleMobCancel() {
+  //   setEditMobile(false);
+  //   setNewMobile("");
+  //   setMobOTPSent(false);
+  //   setMobOTPTimer(null);
+  //   setMobClearTimer(null);
+  // }
 
-  function handleEmailCancel() {
-    setEditEmail(false);
-    setNewEmail("");
-    setEmailOTPSent(false);
-    setEmailOTPTimer(null);
-    setMobClearTimer(null);
-  }
+  // function handleEmailCancel() {
+  //   setEditEmail(false);
+  //   setNewEmail("");
+  //   setEmailOTPSent(false);
+  //   setEmailOTPTimer(null);
+  //   setMobClearTimer(null);
+  // }
 
-  function handelMobileChange(number) {
-    setMobError(false);
-    setNewMobile(number);
-  }
+  // function handelMobileChange(number) {
+  //   setMobError(false);
+  //   setNewMobile(number);
+  // }
 
   return (
     <>

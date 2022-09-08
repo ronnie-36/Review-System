@@ -1,7 +1,7 @@
 const rooturl = "http://localhost:5000/";
 
-export const fetchReviewsByUser = async (userID) => {
-  const url = rooturl + "review/byuser/" + userID;
+export const fetchReviewsByUser = async () => {
+  const url = rooturl + "review/byuser/";
 
   const options = {
     method: "GET",

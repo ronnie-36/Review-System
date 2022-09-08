@@ -55,7 +55,6 @@ export default function initMap(google, setPlaceID) {
   let markers = [];
 
   function callback(results, status) {
-    console.log(results);
     markers.forEach((marker) => marker.setMap(null));
     markers = [];
     // console.log(results);
@@ -149,9 +148,6 @@ export default function initMap(google, setPlaceID) {
       radius: "200",
       fields: fields,
     };
-
-    console.log(place);
-    //setPlaceID();
 
     const service = new google.maps.places.PlacesService(map);
     service.nearbySearch(request, callback);
