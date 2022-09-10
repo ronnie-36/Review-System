@@ -44,7 +44,9 @@ function Header({ logged, setLogged }) {
           {!logged ? (
             <NavLink href="/login/">Login</NavLink>
           ) : (
-            <NavLink onClick={handleLogout}>Logout</NavLink>
+            <NavLink style={{ cursor: "pointer" }} onClick={handleLogout}>
+              Logout
+            </NavLink>
           )}
         </NavItem>
       </Nav>

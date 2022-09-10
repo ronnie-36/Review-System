@@ -5,10 +5,12 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { fetchOrganization } from "../apiHelpers/org";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Spinner } from "reactstrap";
 
 function OrgSearch({ org, setOrg }) {
   const [placeID, setPlaceID] = useState(null);
   const [map, setMap] = useState(null);
+  const [orgLoading, setOrgLoading] = useState(false);
 
   const loader = useMemo(
     () =>
@@ -53,6 +55,7 @@ function OrgSearch({ org, setOrg }) {
   }, [loader, map]);
 
   const getOrganization = async () => {
+    setOrgLoading(true);
     if (placeID) {
       const response = await fetchOrganization(placeID);
       if (response.status === "success") {
@@ -67,6 +70,7 @@ function OrgSearch({ org, setOrg }) {
     } else {
       toast.error("Please select an organization");
     }
+    setOrgLoading(false);
   };
 
   if (org) {
@@ -83,13 +87,22 @@ function OrgSearch({ org, setOrg }) {
           placeholder="Enter an Organization"
         />
       </div>
+      {map === null && (
+        <div>
+          <Spinner>Loading...</Spinner>
+        </div>
+      )}
       <div id="map"></div>
       <div id="infowindow-content">
         <span id="place-name" className="title"></span>
         <br />
-        <span id="place-address"></span>
-        <button className="btn btn-link" onClick={getOrganization}>
-          View Organization
+        <p id="place-address"></p>
+        <button
+          className="btn btn-link vieworgbtn"
+          disabled={orgLoading}
+          onClick={getOrganization}
+        >
+          {orgLoading ? <Spinner>Loading...</Spinner> : "View Organization"}
         </button>
       </div>
     </div>
