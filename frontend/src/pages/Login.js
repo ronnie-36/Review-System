@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./css/Login.css";
-import { Button, Card, CardBody, Input } from "reactstrap";
+import { Button, Card, CardBody, Input, Spinner } from "reactstrap";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -20,6 +20,8 @@ function Login() {
   const [OTPTimer, setOTPTimer] = useState(null);
   const [clearTimer, setClearTimer] = useState(null);
   const [OTP, setOTP] = useState("");
+  const [sendOTPLoading, setSendOTPLoading] = useState(false);
+  const [verifyOTPLoading, setVerifyOTPLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -39,6 +41,7 @@ function Login() {
   }, [OTPTimer, clearTimer]);
 
   async function sendForOTP() {
+    setSendOTPLoading(true);
     if (isValidPhoneNumber(mobile)) {
       const response = await sendOTPMobile(mobile);
       if (response.status === "success") {
@@ -53,14 +56,19 @@ function Login() {
       toast.error("Please enter a valid mobile number");
       setError("Please enter a Valid Mobile Number");
     }
+    setSendOTPLoading(false);
   }
 
   function handelMobileChange(number) {
+    if (OTPSent) {
+      return;
+    }
     setError("");
     setMobile(number);
   }
 
   async function handleMobileLogin() {
+    setVerifyOTPLoading(true);
     const response = await verifyMobileOTP(mobile, OTP);
     if (response.status === "success") {
       toast.success("Logged in successfully");
@@ -69,6 +77,7 @@ function Login() {
       toast.error("Wrong OTP");
       setError("Wrong OTP");
     }
+    setVerifyOTPLoading(false);
   }
 
   function handleGoogleLogin() {
@@ -82,6 +91,7 @@ function Login() {
           <PhoneInput
             placeholder="Enter phone number"
             value={mobile}
+            disabled={OTPSent || verifyOTPLoading}
             onChange={handelMobileChange}
             defaultCountry="IN"
           />
@@ -105,7 +115,7 @@ function Login() {
               color="primary"
               className="mt-3 w-100"
             >
-              Login
+              {verifyOTPLoading ? <Spinner>Loading...</Spinner> : "Login"}
             </Button>
           )}
           <div className="mt-3">
@@ -116,7 +126,13 @@ function Login() {
               disabled={OTPSent && OTPTimer != null}
               className=" w-100"
             >
-              {OTPSent ? "Resend OTP" : "Get OTP"}
+              {sendOTPLoading ? (
+                <Spinner>Sending...</Spinner>
+              ) : OTPSent ? (
+                "Resend OTP"
+              ) : (
+                "Get OTP"
+              )}
             </Button>
           </div>
           <div className=" mt-2 mb-1 d-flex flex-row align-middle">
