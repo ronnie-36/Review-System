@@ -67,7 +67,6 @@ function OrgView({ logged, setLogged, userID, org }) {
         await loader
           .load()
           .then((google) => {
-            // new google.maps.Map(document.getElementById("map"), mapOptions);
             initMap(google, org.loc_lat, org.loc_long);
           })
           .catch((err) => {

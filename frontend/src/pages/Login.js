@@ -13,7 +13,7 @@ import {
 } from "../apiHelpers/authentication";
 import { toast } from "react-toastify";
 
-function Login() {
+function Login({ setLogged }) {
   const [mobile, setMobile] = useState("");
   const [OTPSent, setOTPSent] = useState(false);
   const [error, setError] = useState("");
@@ -72,6 +72,7 @@ function Login() {
     const response = await verifyMobileOTP(mobile, OTP);
     if (response.status === "success") {
       toast.success("Logged in successfully");
+      setLogged(true);
       navigate("/");
     } else {
       toast.error("Wrong OTP");
@@ -112,6 +113,7 @@ function Login() {
           {OTPSent && (
             <Button
               onClick={handleMobileLogin}
+              disabled={verifyOTPLoading}
               color="primary"
               className="mt-3 w-100"
             >
@@ -123,7 +125,7 @@ function Login() {
             <Button
               onClick={sendForOTP}
               color="primary"
-              disabled={OTPSent && OTPTimer != null}
+              disabled={sendOTPLoading || (OTPSent && OTPTimer != null)}
               className=" w-100"
             >
               {sendOTPLoading ? (
