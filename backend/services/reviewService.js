@@ -146,11 +146,11 @@ let getReviews = (id, type) => {
             let query = {};
             let table = "";
             if (type == "user") {
-                table = "review";
+                table = "review JOIN Organization ON review.org = Organization.orgID";
                 query = { 'author': id };
             }
             else if (type == "org") {
-                table = "review JOIN Organization ON review.org = Organization.orgID";
+                table = "review";
                 query = { 'org': id };
             }
             let reviews = [];
