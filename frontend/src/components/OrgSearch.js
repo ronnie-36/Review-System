@@ -3,7 +3,7 @@ import "./css/OrgSearch.css";
 import initMap from "./js/OrgSearch";
 import { Loader } from "@googlemaps/js-api-loader";
 import { fetchOrganization } from "../apiHelpers/org";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Spinner } from "reactstrap";
 
@@ -21,6 +21,8 @@ function OrgSearch({ org, setOrg }) {
       }),
     []
   );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (map && "geolocation" in navigator) {
@@ -60,6 +62,9 @@ function OrgSearch({ org, setOrg }) {
       const response = await fetchOrganization(placeID);
       if (response.status === "success") {
         setOrg(response.placeDetails);
+        //console.log(org);
+        localStorage.setItem("org", JSON.stringify(response.placeDetails));
+        navigate("/orgview");
       } else if (response.status === "unauthorized") {
         toast.warn(
           "Organization does not exist in our database Login to add Organization"
@@ -72,10 +77,6 @@ function OrgSearch({ org, setOrg }) {
     }
     setOrgLoading(false);
   };
-
-  if (org) {
-    return <Navigate to="/orgview" />;
-  }
 
   return (
     <div className="mapContainer">

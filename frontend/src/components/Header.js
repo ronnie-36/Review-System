@@ -12,6 +12,7 @@ function Header({ logged, setLogged }) {
     const response = await logout();
     if (response.status === "success") {
       setLogged(false);
+      localStorage.setItem("user", null);
       navigate("/");
       toast.success("Logged Out successfully");
     } else {

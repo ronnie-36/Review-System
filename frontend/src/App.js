@@ -16,11 +16,14 @@ import { Spinner } from "reactstrap";
 
 function App() {
   const [logged, setLogged] = useState(false);
-  const [userID, setUserID] = useState(null);
-  const [org, setOrg] = useState(null);
+  const [userID, setUserID] = useState(localStorage.getItem("user"));
+  const [org, setOrg] = useState(JSON.parse(localStorage.getItem("org")));
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
+    const temp = JSON.parse(localStorage.getItem("org"));
+    setOrg(temp);
+
     const cookie = Cookies.get();
     if (cookie.jwt) {
       const decoded = jwt_decode(cookie.jwt);
@@ -29,16 +32,20 @@ function App() {
           const response = await checkLogin();
           if (response.status !== "success") {
             setLogged(false);
+            localStorage.setItem("user", null);
           } else {
             setLogged(true);
             setUserID(decoded.id);
+            localStorage.setItem("user", decoded.id);
           }
         })();
       } else {
         setLogged(false);
+        localStorage.setItem("user", null);
       }
     } else {
       setLogged(false);
+      localStorage.setItem("user", null);
     }
     setAuthLoading(false);
   }, []);

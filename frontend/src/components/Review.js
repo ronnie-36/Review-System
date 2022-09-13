@@ -42,6 +42,12 @@ function Review({ review }) {
 
   return (
     <div className="review p-5">
+      {path[0] === "/userdetails" && (
+        <div>
+          <div className="fw-bold">{review.name}</div>
+          <div>{review.address}</div>
+        </div>
+      )}
       <StarRatings
         rating={review.rating}
         numberOfStars={5}
@@ -50,67 +56,57 @@ function Review({ review }) {
       />
       <div>{parseTime(review.time)}</div>
       <div className="">{review.text}</div>
-      <div className="justify-content-around">Media</div>
-      {review.images.length + review.videos.length + review.audios.length && (
-        <div className="d-flex justify-content-between align-items-center">
-          <BsFillArrowLeftCircleFill onClick={getPrevMedia} />
-          {index < review.images.length ? (
-            <ModalImage image={review.images[index]} />
-          ) : index < review.images.length + review.videos.length ? (
-            <ModalVideo video={review.videos[index - review.images.length]} />
-          ) : (
-            index <
-              review.images.length +
-                review.videos.length +
-                review.audios.length && (
-              <div
-                className="mw-100 p-1 d-flex flex-column justify-content-center"
-                style={{ height: "9rem" }}
-              >
-                <audio className="mw-100" controls>
-                  <source
-                    src={
+
+      {review.images.length + review.videos.length + review.audios.length !==
+        0 && (
+        <>
+          <div
+            style={{ height: "13rem" }}
+            className="d-flex justify-content-between align-items-center"
+          >
+            <BsFillArrowLeftCircleFill
+              style={{ cursor: "pointer" }}
+              onClick={getPrevMedia}
+            />
+            {index < review.images.length ? (
+              <ModalImage image={review.images[index]} />
+            ) : index < review.images.length + review.videos.length ? (
+              <ModalVideo video={review.videos[index - review.images.length]} />
+            ) : (
+              index <
+                review.images.length +
+                  review.videos.length +
+                  review.audios.length && (
+                <div
+                  className="mw-100 p-1 d-flex flex-column justify-content-center"
+                  style={{ height: "9rem" }}
+                >
+                  <audio className="mw-100" controls>
+                    <source
+                      src={
+                        review.audios[
+                          index - review.images.length - review.videos.length
+                        ].url
+                      }
+                    />
+                  </audio>
+                  <p style={{ textAlign: "center" }}>
+                    {
                       review.audios[
                         index - review.images.length - review.videos.length
-                      ].url
+                      ].caption
                     }
-                  />
-                </audio>
-                <p style={{ textAlign: "center" }}>
-                  {
-                    review.audios[
-                      index - review.images.length - review.videos.length
-                    ].caption
-                  }
-                </p>
-              </div>
-            )
-          )}
-          <BsFillArrowRightCircleFill onClick={getNextMedia} />
-        </div>
+                  </p>
+                </div>
+              )
+            )}
+            <BsFillArrowRightCircleFill
+              style={{ cursor: "pointer" }}
+              onClick={getNextMedia}
+            />
+          </div>
+        </>
       )}
-      {/* <div className="reviewImages d-flex flex-wrap">
-        {review.images.map((value) => {
-          return <ModalImage key={value.url} image={value} />;
-        })}
-      </div>
-      <div className="reviewVideos d-flex flex-wrap">
-        {review.videos.map((value) => {
-          return <ModalVideo key={value.url} video={value} />;
-        })}
-      </div>
-      <div className="reviewAudios d-flex flex-wrap">
-        {review.audios.map((value) => {
-          return (
-            <div key={value.url} className="mw-100 p-1">
-              <audio className="mw-100" controls>
-                <source src={value.url} />
-              </audio>
-              <p>{value.caption}</p>
-            </div>
-          );
-        })}
-      </div> */}
     </div>
   );
 }
