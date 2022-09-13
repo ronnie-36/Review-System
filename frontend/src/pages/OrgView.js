@@ -3,7 +3,12 @@ import StarRatings from "react-star-ratings";
 import { GoLocation, GoGlobe, GoMail } from "react-icons/go";
 import { BsTelephoneFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
+import {
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+  Spinner,
+} from "reactstrap";
 import { toast } from "react-toastify";
 
 import "./css/OrgView.css";
@@ -18,8 +23,9 @@ function OrgView({ logged, setLogged, userID, org }) {
   const [addSection, setAddSection] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState(null);
   const [avgRating, setavgRating] = useState(0);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   const pageSize = 5;
   const navigate = useNavigate();
@@ -37,7 +43,8 @@ function OrgView({ logged, setLogged, userID, org }) {
   useEffect(() => {
     if (org === null) {
       navigate("/");
-    } else {
+    } else if (reviews === null) {
+      setReviewsLoading(true);
       (async function () {
         const response = await fetchReviewsByOrg(org.orgID);
         if (response.status === "success") {
@@ -55,12 +62,11 @@ function OrgView({ logged, setLogged, userID, org }) {
           toast.error("Unable to fetch reviews");
         }
       })();
-
+      setReviewsLoading(false);
       (async () => {
         await loader
           .load()
           .then((google) => {
-            // new google.maps.Map(document.getElementById("map"), mapOptions);
             initMap(google, org.loc_lat, org.loc_long);
           })
           .catch((err) => {
@@ -68,14 +74,18 @@ function OrgView({ logged, setLogged, userID, org }) {
           });
       })();
     }
-  }, [org, addSection, navigate, loader]);
+  }, [org, addSection, navigate, loader, reviews]);
 
   const handleClick = (e, index) => {
     e.preventDefault();
     setCurrentPage(index);
   };
   if (!org) {
-    return <></>;
+    return (
+      <div className="vw-100 mt-5 d-flex flex-row justify-content-center align-items-center">
+        <Spinner>Loading...</Spinner>
+      </div>
+    );
   }
   return (
     <div className="min-vh-100">
@@ -87,18 +97,21 @@ function OrgView({ logged, setLogged, userID, org }) {
         >
           <div className="">
             <div className="fs-5 fw-bold">{org.name}</div>
-            <div className="d-flex align-items-center">
-              <StarRatings
-                rating={avgRating}
-                numberOfStars={5}
-                starRatedColor="rgb(253,204,13)"
-                starDimension="1rem"
-              />
-              <div className="d-flex ms-2 mt-3 align-items-end">
-                <p className="fs-3 fst-italic ">{avgRating}</p>
-                <p className="fs-4 fst-italic">/5</p>
+            {reviews && (
+              <div className="d-flex align-items-center">
+                <StarRatings
+                  rating={avgRating}
+                  numberOfStars={5}
+                  starRatedColor="rgb(253,204,13)"
+                  starDimension="1rem"
+                />
+                <div className="d-flex ms-2 mt-3 align-items-end">
+                  <p className="fs-3 fst-italic ">{avgRating}</p>
+                  <p className="fs-4 fst-italic">/5</p>
+                  <p className="fs-5 fst-italic">({reviews.length})</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="d-flex flex-column small-dets">
             <div className="d-flex">
@@ -159,19 +172,23 @@ function OrgView({ logged, setLogged, userID, org }) {
           </div>
         </div>
         {!addSection ? (
-          <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
-            {reviews
-              .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-              .map((value) => {
-                return <Review key={value.reviewID} review={value} />;
-              })}
-          </div>
+          !reviewsLoading && reviews ? (
+            <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
+              {reviews
+                .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                .map((value) => {
+                  return <Review key={value.reviewID} review={value} />;
+                })}
+            </div>
+          ) : (
+            <Spinner>Loading...</Spinner>
+          )
         ) : logged ? (
           <NewReview org={org} userID={userID} setAddSection={setAddSection} />
         ) : (
           <div>Please Log in first to add a review</div>
         )}
-        {!addSection && reviews.length !== 0 && (
+        {!addSection && reviews && reviews.length !== 0 && (
           <Pagination aria-label="Page navigation example">
             <PaginationItem disabled={currentPage <= 0}>
               <PaginationLink

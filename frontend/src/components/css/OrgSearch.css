@@ -56,6 +56,10 @@
     margin-top: 0.2rem;
 }
 
+.orgsearchbtn:focus{
+    outline: none;
+}
+
 @media screen and (max-width:700px) {
     .controls{
         width: 80%;

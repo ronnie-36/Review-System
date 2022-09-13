@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "react-dropzone-uploader/dist/styles.css";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Form, FormGroup, Label, Input, Button, Spinner } from "reactstrap";
 import Dropzone from "react-dropzone-uploader";
 import StarRatings from "react-star-ratings";
 import PreviewMedia from "./PreviewMedia";
@@ -15,6 +15,7 @@ function NewReview({ org, setAddSection }) {
     images: [],
     audios: [],
   });
+  const [addReviewLoading, setAddReviewLoading] = useState(false);
 
   const [error, setError] = useState(false);
 
@@ -31,6 +32,7 @@ function NewReview({ org, setAddSection }) {
   };
 
   const submitReview = async () => {
+    setAddReviewLoading(true);
     console.log(newReview);
     if (newReview.text.length > 200) {
       setError(true);
@@ -56,10 +58,12 @@ function NewReview({ org, setAddSection }) {
           review.images.push({ name: filename, caption: image.caption });
         } else {
           toast.error("Unable to upload images");
+          setAddReviewLoading(false);
           return;
         }
       } else {
         toast.error("Unable to upload images");
+        setAddReviewLoading(false);
         return;
       }
     }
@@ -77,10 +81,12 @@ function NewReview({ org, setAddSection }) {
           review.videos.push({ name: filename, caption: video.caption });
         } else {
           toast.error("Unable to upload videos");
+          setAddReviewLoading(false);
           return;
         }
       } else {
         toast.error("Unable to upload videos");
+        setAddReviewLoading(false);
         return;
       }
     }
@@ -98,10 +104,12 @@ function NewReview({ org, setAddSection }) {
           review.audios.push({ name: filename, caption: audio.caption });
         } else {
           toast.error("Unable to upload audios");
+          setAddReviewLoading(false);
           return;
         }
       } else {
         toast.error("Unable to upload audios");
+        setAddReviewLoading(false);
         return;
       }
     }
@@ -121,6 +129,7 @@ function NewReview({ org, setAddSection }) {
     } else {
       toast.error("unable to add the review");
     }
+    setAddReviewLoading(false);
   };
 
   const handleChangeStatus = ({ meta, file }, status) => {
@@ -255,8 +264,12 @@ function NewReview({ org, setAddSection }) {
           />
         </FormGroup>
 
-        <Button onClick={() => submitReview()} color="primary">
-          Submit
+        <Button
+          disabled={addReviewLoading}
+          onClick={() => submitReview()}
+          color="primary"
+        >
+          {addReviewLoading ? <Spinner>Adding..</Spinner> : "Submit"}
         </Button>
       </Form>
     </div>

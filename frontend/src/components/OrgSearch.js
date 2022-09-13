@@ -3,12 +3,14 @@ import "./css/OrgSearch.css";
 import initMap from "./js/OrgSearch";
 import { Loader } from "@googlemaps/js-api-loader";
 import { fetchOrganization } from "../apiHelpers/org";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Spinner } from "reactstrap";
 
 function OrgSearch({ org, setOrg }) {
   const [placeID, setPlaceID] = useState(null);
   const [map, setMap] = useState(null);
+  const [orgLoading, setOrgLoading] = useState(false);
 
   const loader = useMemo(
     () =>
@@ -19,6 +21,8 @@ function OrgSearch({ org, setOrg }) {
       }),
     []
   );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (map && "geolocation" in navigator) {
@@ -53,10 +57,14 @@ function OrgSearch({ org, setOrg }) {
   }, [loader, map]);
 
   const getOrganization = async () => {
+    setOrgLoading(true);
     if (placeID) {
       const response = await fetchOrganization(placeID);
       if (response.status === "success") {
         setOrg(response.placeDetails);
+        //console.log(org);
+        localStorage.setItem("org", JSON.stringify(response.placeDetails));
+        navigate("/orgview");
       } else if (response.status === "unauthorized") {
         toast.warn(
           "Organization does not exist in our database Login to add Organization"
@@ -67,11 +75,8 @@ function OrgSearch({ org, setOrg }) {
     } else {
       toast.error("Please select an organization");
     }
+    setOrgLoading(false);
   };
-
-  if (org) {
-    return <Navigate to="/orgview" />;
-  }
 
   return (
     <div className="mapContainer">
@@ -83,13 +88,22 @@ function OrgSearch({ org, setOrg }) {
           placeholder="Enter an Organization"
         />
       </div>
+      {map === null && (
+        <div>
+          <Spinner>Loading...</Spinner>
+        </div>
+      )}
       <div id="map"></div>
       <div id="infowindow-content">
         <span id="place-name" className="title"></span>
         <br />
-        <span id="place-address"></span>
-        <button className="btn btn-link" onClick={getOrganization}>
-          View Organization
+        <p id="place-address"></p>
+        <button
+          className="btn btn-link vieworgbtn"
+          disabled={orgLoading}
+          onClick={getOrganization}
+        >
+          {orgLoading ? <Spinner>Loading...</Spinner> : "View Organization"}
         </button>
       </div>
     </div>

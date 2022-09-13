@@ -12,6 +12,7 @@ function Header({ logged, setLogged }) {
     const response = await logout();
     if (response.status === "success") {
       setLogged(false);
+      localStorage.setItem("user", null);
       navigate("/");
       toast.success("Logged Out successfully");
     } else {
@@ -44,7 +45,9 @@ function Header({ logged, setLogged }) {
           {!logged ? (
             <NavLink href="/login/">Login</NavLink>
           ) : (
-            <NavLink onClick={handleLogout}>Logout</NavLink>
+            <NavLink style={{ cursor: "pointer" }} onClick={handleLogout}>
+              Logout
+            </NavLink>
           )}
         </NavItem>
       </Nav>
