@@ -1,7 +1,5 @@
-const rooturl = "http://localhost:5000/";
-
 export const fetchReviewsByUser = async () => {
-  const url = rooturl + "review/byuser/";
+  const url = process.env.REACT_APP_BACKEND_URL + "review/byuser/";
 
   const options = {
     method: "GET",
@@ -21,7 +19,7 @@ export const fetchReviewsByUser = async () => {
 };
 
 export const fetchReviewsByOrg = async (orgID) => {
-  const url = rooturl + "review/byorg/" + orgID;
+  const url = process.env.REACT_APP_BACKEND_URL + "review/byorg/" + orgID;
 
   const options = {
     method: "GET",
@@ -41,7 +39,7 @@ export const fetchReviewsByOrg = async (orgID) => {
 };
 
 export const getSignedURL = async (type) => {
-  const url = rooturl + "review/multimedia";
+  const url = process.env.REACT_APP_BACKEND_URL + "review/multimedia";
 
   const data = { filetype: type };
 
@@ -85,7 +83,7 @@ export const uploadToAWS = async (signedURL, file) => {
 };
 
 export const postReview = async (review) => {
-  const url = rooturl + "review/add";
+  const url = process.env.REACT_APP_BACKEND_URL + "review/add";
   console.log(review);
   const data = review;
 

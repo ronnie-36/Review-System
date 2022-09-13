@@ -1,7 +1,5 @@
-const rooturl = "http://localhost:5000/";
-
 export const fetchOrganization = async (place_id) => {
-  const url = rooturl + "org/search";
+  const url = process.env.REACT_APP_BACKEND_URL + "org/search";
   const data = { place_id: place_id };
 
   const options = {

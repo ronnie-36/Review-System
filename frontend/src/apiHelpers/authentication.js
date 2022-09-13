@@ -1,7 +1,5 @@
-const rooturl = "http://localhost:5000/";
-
 export const checkLogin = async () => {
-  const url = rooturl + "auth/check";
+  const url = process.env.REACT_APP_BACKEND_URL + "auth/check";
 
   const options = {
     method: "GET",
@@ -23,12 +21,12 @@ export const checkLogin = async () => {
 };
 
 export const loginWithGoogle = async () => {
-  const url = rooturl + "auth/google";
+  const url = process.env.REACT_APP_BACKEND_URL + "auth/google";
   window.open(url, "_self");
 };
 
 export const sendOTPMobile = async (mobile) => {
-  const url = rooturl + "auth/phone";
+  const url = process.env.REACT_APP_BACKEND_URL + "auth/phone";
   const data = { phone: mobile };
   const options = {
     method: "POST",
@@ -53,7 +51,7 @@ export const sendOTPMobile = async (mobile) => {
 };
 
 export const verifyMobileOTP = async (mobile, otp, id) => {
-  const url = rooturl + "auth/phone/verifyOTP";
+  const url = process.env.REACT_APP_BACKEND_URL + "auth/phone/verifyOTP";
   const data = { phone: mobile, otp: otp, user: id };
 
   const options = {
@@ -76,7 +74,7 @@ export const verifyMobileOTP = async (mobile, otp, id) => {
 };
 
 export const logout = async () => {
-  const url = rooturl + "auth/logout";
+  const url = process.env.REACT_APP_BACKEND_URL + "auth/logout";
   const options = {
     method: "GET",
     credentials: "include",
