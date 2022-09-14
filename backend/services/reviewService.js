@@ -1,5 +1,6 @@
 import DBConnection from "../config/db.js";
 import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 
 let addMultimedia = (data, type, id) => {
     return new Promise(async (resolve, reject) => {
@@ -76,8 +77,16 @@ let getMultimedia = (id) => {
                         'videos': [],
                         'audios': []
                     };
-                    multimedia.forEach((media) => {
+                    for (let media of multimedia) {
                         let url = process.env.IPFS_URL.concat(media.mediaref);
+                        let captionUrl = process.env.IPFS_URL.concat(media.caption);
+                        await axios.get(captionUrl)
+                            .then((response) => {
+                                media.caption = response.data;
+                            })
+                            .catch((err) => {
+                                throw (err);
+                            });
                         switch (media.type) {
                             case 'image': {
                                 output.images.push({ 'url': url, 'caption': media.caption });
@@ -94,7 +103,7 @@ let getMultimedia = (id) => {
                             default:
                                 break;
                         }
-                    });
+                    }
                     resolve(output);
                 }
             );
@@ -128,6 +137,14 @@ let getReviews = (id, type) => {
                     reviews = [...rows];
                     let output = [];
                     for (let review of reviews) {
+                        let textUrl = process.env.IPFS_URL.concat(review.text);
+                        await axios.get(textUrl)
+                            .then((response) => {
+                                review.text = response.data;
+                            })
+                            .catch((err) => {
+                                throw (err);
+                            });
                         let multimedia = await getMultimedia(review.reviewID);
                         output.push({ ...review, ...multimedia });
                     }

@@ -38,8 +38,16 @@ function NewReview({ org, setAddSection }) {
       setError(true);
     }
 
+    let ipfs = await getIPFSclient();
+    const result = await ipfs.add(newReview.text);
+    if (!result) {
+      toast.error("Error adding review text.");
+      setAddReviewLoading(false);
+      return;
+    }
+
     let review = {
-      text: newReview.text,
+      text: result.path,
       rating: newReview.rating,
       org: org.orgID,
       images: [], //{name:"",caption:""}
@@ -47,12 +55,12 @@ function NewReview({ org, setAddSection }) {
       audios: [],
     };
 
-    let ipfs = await getIPFSclient();
     for (const image of newReview.images) {
       if (ipfs) {
-        const result = await ipfs.add(image.file);
-        if (result) {
-          review.images.push({ name: result.path, caption: image.caption });
+        const fileResult = await ipfs.add(image.file);
+        const captionResult = await ipfs.add(image.caption);
+        if (fileResult && captionResult) {
+          review.images.push({ name: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload images");
           setAddReviewLoading(false);
@@ -67,9 +75,10 @@ function NewReview({ org, setAddSection }) {
 
     for (const video of newReview.videos) {
       if (ipfs) {
-        const result = await ipfs.add(video.file);
-        if (result) {
-          review.videos.push({ name: result.path, caption: video.caption });
+        const fileResult = await ipfs.add(video.file);
+        const captionResult = await ipfs.add(video.caption);
+        if (fileResult && captionResult) {
+          review.videos.push({ name: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload videos");
           setAddReviewLoading(false);
@@ -84,9 +93,10 @@ function NewReview({ org, setAddSection }) {
 
     for (const audio of newReview.audios) {
       if (ipfs) {
-        const result = await ipfs.add(audio.file);
-        if (result) {
-          review.audios.push({ name: result.path, caption: audio.caption });
+        const fileResult = await ipfs.add(audio.file);
+        const captionResult = await ipfs.add(audio.caption);
+        if (fileResult && captionResult) {
+          review.audios.push({ name: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload audios");
           setAddReviewLoading(false);
