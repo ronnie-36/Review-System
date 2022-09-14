@@ -4,7 +4,7 @@ import { Form, FormGroup, Label, Input, Button, Spinner } from "reactstrap";
 import Dropzone from "react-dropzone-uploader";
 import StarRatings from "react-star-ratings";
 import PreviewMedia from "./PreviewMedia";
-import { getSignedURL, postReview, uploadToAWS } from "../apiHelpers/review";
+import { postReview, getIPFSclient } from "../apiHelpers/review";
 import { toast } from "react-toastify";
 
 function NewReview({ org, setAddSection }) {
@@ -47,15 +47,12 @@ function NewReview({ org, setAddSection }) {
       audios: [],
     };
 
+    let ipfs = await getIPFSclient();
     for (const image of newReview.images) {
-      const response = await getSignedURL("image");
-      console.log(response);
-      if (response.status === "success") {
-        const filename = response.filename;
-        const signedURL = response.url;
-        const uploadStatus = await uploadToAWS(signedURL, image.file);
-        if (uploadStatus.status === "success") {
-          review.images.push({ name: filename, caption: image.caption });
+      if (ipfs) {
+        const result = await ipfs.add(image.file);
+        if (result) {
+          review.images.push({ name: result.path, caption: image.caption });
         } else {
           toast.error("Unable to upload images");
           setAddReviewLoading(false);
@@ -69,16 +66,10 @@ function NewReview({ org, setAddSection }) {
     }
 
     for (const video of newReview.videos) {
-      const response = await getSignedURL("video");
-      console.log(response);
-      if (response.status === "success") {
-        const filename = response.filename;
-        const signedURL = response.url;
-
-        const uploadStatus = await uploadToAWS(signedURL, video.file);
-
-        if (uploadStatus.status === "success") {
-          review.videos.push({ name: filename, caption: video.caption });
+      if (ipfs) {
+        const result = await ipfs.add(video.file);
+        if (result) {
+          review.videos.push({ name: result.path, caption: video.caption });
         } else {
           toast.error("Unable to upload videos");
           setAddReviewLoading(false);
@@ -92,16 +83,10 @@ function NewReview({ org, setAddSection }) {
     }
 
     for (const audio of newReview.audios) {
-      const response = await getSignedURL("video");
-      console.log(response);
-      if (response.status === "success") {
-        const filename = response.filename;
-        const signedURL = response.url;
-
-        const uploadStatus = await uploadToAWS(signedURL, audio.file);
-
-        if (uploadStatus.status === "success") {
-          review.audios.push({ name: filename, caption: audio.caption });
+      if (ipfs) {
+        const result = await ipfs.add(audio.file);
+        if (result) {
+          review.audios.push({ name: result.path, caption: audio.caption });
         } else {
           toast.error("Unable to upload audios");
           setAddReviewLoading(false);
@@ -237,9 +222,8 @@ function NewReview({ org, setAddSection }) {
                 setNewReview: setNewReview,
               });
             }}
-            accept={`${checkImageValidation() ? "image/*," : ""}${
-              checkVideoValidation() ? "video/*," : ""
-            }${checkAudioValidation() ? "audio/*" : ""}`}
+            accept={`${checkImageValidation() ? "image/*," : ""}${checkVideoValidation() ? "video/*," : ""
+              }${checkAudioValidation() ? "audio/*" : ""}`}
             inputContent={(_, extra) => {
               return extra.reject
                 ? "Image, audio and video files only"
@@ -250,10 +234,10 @@ function NewReview({ org, setAddSection }) {
                 ? /image\/\w+/.test(extra.dragged[0].type)
                   ? "Image Limit reached for the review"
                   : /video\/\w+/.test(extra.dragged[0].type)
-                  ? "Video Limit Reached"
-                  : /audio\/\w+/.test(extra.dragged[0].type)
-                  ? "Audio Limit Reached"
-                  : "Image, audio and video files only"
+                    ? "Video Limit Reached"
+                    : /audio\/\w+/.test(extra.dragged[0].type)
+                      ? "Audio Limit Reached"
+                      : "Image, audio and video files only"
                 : "Add Files";
             }}
             styles={{

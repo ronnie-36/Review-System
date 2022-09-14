@@ -1,41 +1,5 @@
 import DBConnection from "../config/db.js";
-import aws from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
-
-aws.config.update({
-    signatureVersion: 'v4',
-    region: 'ap-south-1',
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY
-});
-
-let getSignedURL = (filetype) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            var s3 = new aws.S3();
-            let filename = uuidv4();
-
-            var params = {
-                Bucket: 'reviewsystemmultimedia',
-                Key: filename,
-                Expires: 60,
-                ContentType: filetype
-            };
-
-            s3.getSignedUrl('putObject', params, function (err, data) {
-                if (err) {
-                    console.log(err);
-                    throw (err);
-                }
-                else {
-                    resolve({ filename, 'url': data });
-                }
-            });
-        } catch (err) {
-            reject(err);
-        }
-    });
-};
 
 let addMultimedia = (data, type, id) => {
     return new Promise(async (resolve, reject) => {
@@ -113,7 +77,7 @@ let getMultimedia = (id) => {
                         'audios': []
                     };
                     multimedia.forEach((media) => {
-                        let url = process.env.AWS_S3_URL.concat(media.mediaref);
+                        let url = process.env.IPFS_URL.concat(media.mediaref);
                         switch (media.type) {
                             case 'image': {
                                 output.images.push({ 'url': url, 'caption': media.caption });
@@ -177,7 +141,6 @@ let getReviews = (id, type) => {
 };
 
 export default {
-    getSignedURL: getSignedURL,
     addReview: addReview,
     getReviews: getReviews,
 };
