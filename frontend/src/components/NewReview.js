@@ -7,7 +7,7 @@ import PreviewMedia from "./PreviewMedia";
 import { getSignedURL, postReview, uploadToAWS } from "../apiHelpers/review";
 import { toast } from "react-toastify";
 
-function NewReview({ org, setAddSection }) {
+function NewReview({ org, setAddSection, getReveiws }) {
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
@@ -47,6 +47,7 @@ function NewReview({ org, setAddSection }) {
       audios: [],
     };
 
+    //image upload section for reviews
     for (const image of newReview.images) {
       const response = await getSignedURL("image");
       console.log(response);
@@ -68,6 +69,7 @@ function NewReview({ org, setAddSection }) {
       }
     }
 
+    //video upload
     for (const video of newReview.videos) {
       const response = await getSignedURL("video");
       console.log(response);
@@ -91,6 +93,7 @@ function NewReview({ org, setAddSection }) {
       }
     }
 
+    //audio upload
     for (const audio of newReview.audios) {
       const response = await getSignedURL("video");
       console.log(response);
@@ -126,9 +129,11 @@ function NewReview({ org, setAddSection }) {
       });
       toast.success("Review added successfully");
       setAddSection(false);
+      getReveiws();
     } else {
       toast.error("unable to add the review");
     }
+
     setAddReviewLoading(false);
   };
 

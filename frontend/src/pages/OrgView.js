@@ -40,12 +40,29 @@ function OrgView({ logged, setLogged, userID, org }) {
     []
   );
 
+  const getReviews = async () => {
+    const response = await fetchReviewsByOrg(org.orgID);
+    if (response.status === "success") {
+      setReviews(response.reviews);
+      setPageCount(Math.ceil(response.reviews.length / pageSize));
+      if (response.reviews.length !== 0) {
+        setavgRating(
+          response.reviews.reduce((total, review) => total + review.rating, 0) /
+            response.reviews.length
+        );
+      }
+    } else {
+      toast.error("Unable to fetch reviews");
+    }
+  };
+
   useEffect(() => {
     if (org === null) {
       navigate("/");
     } else if (reviews === null) {
       setReviewsLoading(true);
-      (async function () {
+      (async () => {
+        // await getReviews();
         const response = await fetchReviewsByOrg(org.orgID);
         if (response.status === "success") {
           setReviews(response.reviews);
@@ -90,6 +107,7 @@ function OrgView({ logged, setLogged, userID, org }) {
   return (
     <div className="min-vh-100">
       <Header logged={logged} setLogged={setLogged} />
+      {/* org details header */}
       <div className="d-flex OrgView p-3">
         <div
           style={{ minHeight: "10rem" }}
@@ -184,7 +202,12 @@ function OrgView({ logged, setLogged, userID, org }) {
             <Spinner>Loading...</Spinner>
           )
         ) : logged ? (
-          <NewReview org={org} userID={userID} setAddSection={setAddSection} />
+          <NewReview
+            org={org}
+            userID={userID}
+            setAddSection={setAddSection}
+            getReveiws={getReviews}
+          />
         ) : (
           <div>Please Log in first to add a review</div>
         )}
