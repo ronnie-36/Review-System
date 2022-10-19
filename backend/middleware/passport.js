@@ -3,7 +3,7 @@ import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 import AnonymousStrategy from "passport-anonymous";
 import loginService from "../services/loginService.js";
 import registerService from "../services/registerService.js";
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 
 export default (passport) => {
     passport.use(
@@ -45,7 +45,7 @@ export default (passport) => {
         },
             async (accessToken, refreshToken, profile, done) => {
                 const newUser = {
-                    id: uuidv4(),
+                    id: nanoid(),
                     email: profile.emails[0].value,
                     firstName: profile.name.givenName,
                     lastName: profile.name.familyName,

@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import registerService from "../services/registerService.js";
 import verifyPhoneService from "../services/verifyPhoneService.js";
 import { optionalJwtAuth, requireJwtAuth } from "../middleware/auth.js";
-import { v4 as uuidv4 } from "uuid";
+import { nanoid } from 'nanoid';
 
 let router = express.Router();
 
@@ -106,10 +106,10 @@ router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next)
         let user = await registerService.checkExistPhone(phone);
         if (!user) {
           user = await registerService.createNewUser({
-            id: uuidv4(),
+            id: nanoid(),
             phone: phone,
             email: "",
-          });
+          }, true);
         }
         let token = jwt.sign(
           {
@@ -157,7 +157,7 @@ router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next)
           }
         }
         else {
-          await registerService.update({ phone: phone }, req.user.id);
+          await registerService.update({ phone: phone }, req.user.id, true);
         }
       }
       res.status(200);
@@ -177,6 +177,7 @@ router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next)
       return res.end();
     }
   } catch (e) {
+    console.log(e);
     next(e);
   }
 }

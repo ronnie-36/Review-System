@@ -8,6 +8,7 @@
     "dev": "nodemon app.js"
   },
   "dependencies": {
+    "@project-serum/anchor": "^0.25.0",
     "aws-sdk": "^2.1204.0",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
@@ -23,6 +24,7 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
     "mysql2": "^2.3.3",
+    "nanoid": "^4.0.0",
     "passport": "^0.6.0",
     "passport-anonymous": "^1.0.1",
     "passport-google-oauth2": "^0.2.0",

@@ -1,5 +1,9 @@
 import DBConnection from "../config/db.js";
 import axios from "axios";
+import anchor from "@project-serum/anchor";
+import { program, provider } from "../config/solana/main.js";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils/index.js";
+const { SystemProgram } = anchor.web3;
 
 let addOrg = (place_id) => {
     return new Promise(async (resolve, reject) => {
@@ -24,10 +28,22 @@ let addOrg = (place_id) => {
                 }
                 DBConnection.query(
                     ' INSERT INTO Organization set ? ', newOrg,
-                    function (err, rows) {
+                    async function (err, rows) {
                         if (err) {
                             throw (err);
                         }
+                        const seeds = [Buffer.from("organization"), Buffer.from(place_id)];
+                        const [orgAccount, _bump] = publicKey.findProgramAddressSync(
+                            seeds,
+                            program._programId
+                        );
+                        await program.rpc.createOrganization(place_id, {
+                            accounts: {
+                                orgAccount: orgAccount,
+                                user: provider.wallet.publicKey,
+                                systemProgram: SystemProgram.programId,
+                            },
+                        });
                         resolve(newOrg);
                     }
                 );
