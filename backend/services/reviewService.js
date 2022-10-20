@@ -71,7 +71,7 @@ let addReview = (review, id) => {
     });
 };
 
-let prepareReview = (reviewData) => {
+let prepareReview = (reviewData, withOrg) => {
     return new Promise(async (resolve, reject) => {
         try {
             let outputReview = {
@@ -125,7 +125,25 @@ let prepareReview = (reviewData) => {
                     });
                 outputReview.audios.push({ 'url': url, 'caption': audio.caption });
             }
-            resolve(outputReview);
+            if (withOrg) {
+                DBConnection.query(
+                    ' SELECT * FROM `Organization` WHERE `orgID` = ?  ', reviewData.organization,
+                    async function (err, rows) {
+                        if (err) {
+                            throw (err);
+                        }
+                        if (rows.length > 0) {
+                            resolve({ ...outputReview, ...rows[0] });
+                        }
+                        else {
+                            throw ("Error finding Organization.");
+                        }
+                    }
+                );
+            }
+            else {
+                resolve(outputReview);
+            }
         } catch (err) {
             reject(err);
         }
@@ -156,7 +174,7 @@ let getReviews = (id, type) => {
                         userReviewAccount
                     );
                     const reviewData = await program.account.review.fetch(userReviewData.review);
-                    let newReview = await prepareReview(reviewData);
+                    let newReview = await prepareReview(reviewData, true);
                     output.push(newReview);
                 }
             }
@@ -179,7 +197,7 @@ let getReviews = (id, type) => {
                         program._programId
                     );
                     const reviewData = await program.account.review.fetch(reviewAccount);
-                    let newReview = await prepareReview(reviewData);
+                    let newReview = await prepareReview(reviewData, false);
                     output.push(newReview);
                 }
             }
