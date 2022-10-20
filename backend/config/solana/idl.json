@@ -165,101 +165,140 @@
                   "type": "string"
                 },
                 {
-                  "name": "images",
-                  "type": {
-                    "vec": "string"
-                  }
-                },
-                {
-                  "name": "videos",
-                  "type": {
-                    "vec": "string"
-                  }
-                },
-                {
-                  "name": "audios",
-                  "type": {
-                    "vec": "string"
-                  }
-                },
-                {
-                  "name": "organization",
-                  "type": "publicKey"
-                },
-                {
-                  "name": "user",
-                  "type": "publicKey"
-                },
-                {
-                  "name": "bump",
-                  "type": "u8"
-                }
-              ]
+            "name": "rating",
+            "type": "u8"
+          },
+          {
+            "name": "time",
+            "type": "string"
+          },
+          {
+            "name": "images",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "videos",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "audios",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "organization",
+            "type": "string"
+          },
+          {
+            "name": "user",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "MultimediaStruct",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mediaref",
+            "type": "string"
+          },
+          {
+            "name": "caption",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewReview",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "text",
+            "type": "string"
+          },
+          {
+            "name": "rating",
+            "type": "u8"
+          },
+          {
+            "name": "time",
+            "type": "string"
+          },
+          {
+            "name": "images",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "videos",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "audios",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
             }
           }
-        ],
-          "types": [
-            {
-              "name": "NewReview",
-              "type": {
-                "kind": "struct",
-                "fields": [
-                  {
-                    "name": "text",
-                    "type": "string"
-                  },
-                  {
-                    "name": "images",
-                    "type": {
-                      "vec": "string"
-                    }
-                  },
-                  {
-                    "name": "videos",
-                    "type": {
-                      "vec": "string"
-                    }
-                  },
-                  {
-                    "name": "audios",
-                    "type": {
-                      "vec": "string"
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-            "errors": [
-              {
-                "code": 6000,
-                "name": "ReviewTextTooLarge",
-                "msg": "Review text cannot exceed 200 characters"
-              },
-              {
-                "code": 6001,
-                "name": "MaxImageLimitReached",
-                "msg": "Maximum 5 images can be attached"
-              },
-              {
-                "code": 6002,
-                "name": "MaxVideoLimitReached",
-                "msg": "Maximum 5 videos can be attached"
-              },
-              {
-                "code": 6003,
-                "name": "MaxAudioLimitReached",
-                "msg": "Maximum 5 audios can be attached"
-              },
-              {
-                "code": 6004,
-                "name": "MaxOrganizationReviewLimitReached",
-                "msg": "Maximum Review Limit Reached for organization"
-              },
-              {
-                "code": 6005,
-                "name": "MaxUserReviewLimitReached",
-                "msg": "Maximum Review Limit Reached for user"
-              }
-            ]
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "MaxImageLimitReached",
+      "msg": "Maximum 5 images can be attached"
+    },
+    {
+      "code": 6001,
+      "name": "MaxVideoLimitReached",
+      "msg": "Maximum 5 videos can be attached"
+    },
+    {
+      "code": 6002,
+      "name": "MaxAudioLimitReached",
+      "msg": "Maximum 5 audios can be attached"
+    },
+    {
+      "code": 6003,
+      "name": "MaxOrganizationReviewLimitReached",
+      "msg": "Maximum Review Limit Reached for organization"
+    },
+    {
+      "code": 6004,
+      "name": "MaxUserReviewLimitReached",
+      "msg": "Maximum Review Limit Reached for user"
+    }
+  ]
 }

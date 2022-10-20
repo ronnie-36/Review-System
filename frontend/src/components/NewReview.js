@@ -50,7 +50,7 @@ function NewReview({ org, setAddSection }) {
       text: result.path,
       rating: newReview.rating,
       org: org.orgID,
-      images: [], //{name:"",caption:""}
+      images: [], //{mediaref:"",caption:""}
       videos: [],
       audios: [],
     };
@@ -60,7 +60,7 @@ function NewReview({ org, setAddSection }) {
         const fileResult = await ipfs.add(image.file);
         const captionResult = await ipfs.add(image.caption);
         if (fileResult && captionResult) {
-          review.images.push({ name: fileResult.path, caption: captionResult.path });
+          review.images.push({ mediaref: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload images");
           setAddReviewLoading(false);
@@ -78,7 +78,7 @@ function NewReview({ org, setAddSection }) {
         const fileResult = await ipfs.add(video.file);
         const captionResult = await ipfs.add(video.caption);
         if (fileResult && captionResult) {
-          review.videos.push({ name: fileResult.path, caption: captionResult.path });
+          review.videos.push({ mediaref: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload videos");
           setAddReviewLoading(false);
@@ -96,7 +96,7 @@ function NewReview({ org, setAddSection }) {
         const fileResult = await ipfs.add(audio.file);
         const captionResult = await ipfs.add(audio.caption);
         if (fileResult && captionResult) {
-          review.audios.push({ name: fileResult.path, caption: captionResult.path });
+          review.audios.push({ mediaref: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload audios");
           setAddReviewLoading(false);
