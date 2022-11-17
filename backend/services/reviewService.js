@@ -1,5 +1,6 @@
 import DBConnection from "../config/db.js";
 import { nanoid } from 'nanoid';
+import encryptionService from "./encryptionService.js";
 import axios from "axios";
 import anchor from "@project-serum/anchor";
 import { program, provider } from "../config/solana/main.js";
@@ -18,7 +19,8 @@ let addReview = (review, id) => {
                 audios: review.audios,
                 time: new Date().toISOString(),
             };
-            const orgSeeds = [Buffer.from("organization"), Buffer.from(review.org)];
+            const encrypted_org_id = encryptionService.encrypt(review.org);
+            const orgSeeds = [Buffer.from("organization"), Buffer.from(encrypted_org_id)];
             const [orgAccount, _orgBump] = publicKey.findProgramAddressSync(
                 orgSeeds,
                 program._programId
@@ -26,7 +28,8 @@ let addReview = (review, id) => {
 
             let orgData = await program.account.organization.fetch(orgAccount);
 
-            const userSeeds = [Buffer.from("user"), Buffer.from(id)];
+            const encrypted_user_id = encryptionService.encrypt(id);
+            const userSeeds = [Buffer.from("user"), Buffer.from(encrypted_user_id)];
             const [userAccount, _userBump] = publicKey.findProgramAddressSync(
                 userSeeds,
                 program._programId
@@ -54,7 +57,7 @@ let addReview = (review, id) => {
             const [userReviewAccount, _userReviewBump] =
                 publicKey.findProgramAddressSync(userReviewSeeds, program._programId);
 
-            await program.rpc.createReview(review.org, id, newReview, {
+            await program.rpc.createReview(encrypted_org_id, encrypted_user_id, newReview, {
                 accounts: {
                     orgAccount: orgAccount,
                     userAccount: userAccount,
@@ -127,7 +130,7 @@ let prepareReview = (reviewData, withOrg) => {
             }
             if (withOrg) {
                 DBConnection.query(
-                    ' SELECT * FROM `Organization` WHERE `orgID` = ?  ', reviewData.organization,
+                    ' SELECT * FROM `Organization` WHERE `orgID` = ?  ', encryptionService.decrypt(reviewData.organization),
                     async function (err, rows) {
                         if (err) {
                             throw (err);
@@ -155,7 +158,8 @@ let getReviews = (id, type) => {
         try {
             let output = [];
             if (type == "user") {
-                const userSeeds = [Buffer.from("user"), Buffer.from(id)];
+                const encrypted_user_id = encryptionService.encrypt(id);
+                const userSeeds = [Buffer.from("user"), Buffer.from(encrypted_user_id)];
                 const [userAccount, _userBump] = publicKey.findProgramAddressSync(
                     userSeeds,
                     program._programId
@@ -179,7 +183,8 @@ let getReviews = (id, type) => {
                 }
             }
             else if (type == "org") {
-                const orgSeeds = [Buffer.from("organization"), Buffer.from(id)];
+                const encrypted_org_id = encryptionService.encrypt(id);
+                const orgSeeds = [Buffer.from("organization"), Buffer.from(encrypted_org_id)];
                 const [orgAccount, _orgBump] = publicKey.findProgramAddressSync(
                     orgSeeds,
                     program._programId

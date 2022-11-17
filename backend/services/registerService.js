@@ -1,5 +1,6 @@
 import DBConnection from "../config/db.js";
 import anchor from "@project-serum/anchor";
+import encryptionService from "./encryptionService.js"
 import { program, provider } from "../config/solana/main.js";
 import { publicKey } from "@project-serum/anchor/dist/cjs/utils/index.js";
 const { SystemProgram } = anchor.web3;
@@ -122,13 +123,14 @@ let checkExistPhone = (phone) => {
 let createUserOnBlockchain = (user_id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const seeds = [Buffer.from("user"), Buffer.from(user_id)];
+            const encrypted_user_id = encryptionService.encrypt(user_id);
+            const seeds = [Buffer.from("user"), Buffer.from(encrypted_user_id)];
             const [userAccount, _bump] = publicKey.findProgramAddressSync(
                 seeds,
                 program._programId
             );
 
-            await program.rpc.createUser(user_id, {
+            await program.rpc.createUser(encrypted_user_id, {
                 accounts: {
                     userAccount: userAccount,
                     user: provider.wallet.publicKey,

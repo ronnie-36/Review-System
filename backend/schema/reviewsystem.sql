@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS `Organization`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Organization` (
   `orgID` varchar(45) NOT NULL,
+  `placeID` varchar(512) NOT NULL,
   `name` varchar(120) DEFAULT NULL,
   `loc_lat` varchar(45) DEFAULT NULL,
   `loc_long` varchar(45) DEFAULT NULL,
@@ -29,7 +30,8 @@ CREATE TABLE `Organization` (
   `address` varchar(150) DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
   `website` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`orgID`)
+  PRIMARY KEY (`orgID`),
+  UNIQUE KEY `placeID_UNIQUE` (`placeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
