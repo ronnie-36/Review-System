@@ -4,7 +4,7 @@ import { Form, FormGroup, Label, Input, Button, Spinner } from "reactstrap";
 import Dropzone from "react-dropzone-uploader";
 import StarRatings from "react-star-ratings";
 import PreviewMedia from "./PreviewMedia";
-import { getSignedURL, postReview, uploadToAWS } from "../apiHelpers/review";
+import { postReview, getIPFSclient } from "../apiHelpers/review";
 import { toast } from "react-toastify";
 
 function NewReview({ org, setAddSection, getReveiws }) {
@@ -38,25 +38,30 @@ function NewReview({ org, setAddSection, getReveiws }) {
       setError(true);
     }
 
+    let ipfs = await getIPFSclient();
+    const result = await ipfs.add(newReview.text);
+    if (!result) {
+      toast.error("Error adding review text.");
+      setAddReviewLoading(false);
+      return;
+    }
+
     let review = {
-      text: newReview.text,
+      text: result.path,
       rating: newReview.rating,
       org: org.orgID,
-      images: [], //{name:"",caption:""}
+      images: [], //{mediaref:"",caption:""}
       videos: [],
       audios: [],
     };
 
     //image upload section for reviews
     for (const image of newReview.images) {
-      const response = await getSignedURL("image");
-      console.log(response);
-      if (response.status === "success") {
-        const filename = response.filename;
-        const signedURL = response.url;
-        const uploadStatus = await uploadToAWS(signedURL, image.file);
-        if (uploadStatus.status === "success") {
-          review.images.push({ name: filename, caption: image.caption });
+      if (ipfs) {
+        const fileResult = await ipfs.add(image.file);
+        const captionResult = await ipfs.add(image.caption);
+        if (fileResult && captionResult) {
+          review.images.push({ mediaref: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload images");
           setAddReviewLoading(false);
@@ -71,16 +76,11 @@ function NewReview({ org, setAddSection, getReveiws }) {
 
     //video upload
     for (const video of newReview.videos) {
-      const response = await getSignedURL("video");
-      console.log(response);
-      if (response.status === "success") {
-        const filename = response.filename;
-        const signedURL = response.url;
-
-        const uploadStatus = await uploadToAWS(signedURL, video.file);
-
-        if (uploadStatus.status === "success") {
-          review.videos.push({ name: filename, caption: video.caption });
+      if (ipfs) {
+        const fileResult = await ipfs.add(video.file);
+        const captionResult = await ipfs.add(video.caption);
+        if (fileResult && captionResult) {
+          review.videos.push({ mediaref: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload videos");
           setAddReviewLoading(false);
@@ -95,16 +95,11 @@ function NewReview({ org, setAddSection, getReveiws }) {
 
     //audio upload
     for (const audio of newReview.audios) {
-      const response = await getSignedURL("video");
-      console.log(response);
-      if (response.status === "success") {
-        const filename = response.filename;
-        const signedURL = response.url;
-
-        const uploadStatus = await uploadToAWS(signedURL, audio.file);
-
-        if (uploadStatus.status === "success") {
-          review.audios.push({ name: filename, caption: audio.caption });
+      if (ipfs) {
+        const fileResult = await ipfs.add(audio.file);
+        const captionResult = await ipfs.add(audio.caption);
+        if (fileResult && captionResult) {
+          review.audios.push({ mediaref: fileResult.path, caption: captionResult.path });
         } else {
           toast.error("Unable to upload audios");
           setAddReviewLoading(false);
@@ -242,9 +237,8 @@ function NewReview({ org, setAddSection, getReveiws }) {
                 setNewReview: setNewReview,
               });
             }}
-            accept={`${checkImageValidation() ? "image/*," : ""}${
-              checkVideoValidation() ? "video/*," : ""
-            }${checkAudioValidation() ? "audio/*" : ""}`}
+            accept={`${checkImageValidation() ? "image/*," : ""}${checkVideoValidation() ? "video/*," : ""
+              }${checkAudioValidation() ? "audio/*" : ""}`}
             inputContent={(_, extra) => {
               return extra.reject
                 ? "Image, audio and video files only"
@@ -255,10 +249,10 @@ function NewReview({ org, setAddSection, getReveiws }) {
                 ? /image\/\w+/.test(extra.dragged[0].type)
                   ? "Image Limit reached for the review"
                   : /video\/\w+/.test(extra.dragged[0].type)
-                  ? "Video Limit Reached"
-                  : /audio\/\w+/.test(extra.dragged[0].type)
-                  ? "Audio Limit Reached"
-                  : "Image, audio and video files only"
+                    ? "Video Limit Reached"
+                    : /audio\/\w+/.test(extra.dragged[0].type)
+                      ? "Audio Limit Reached"
+                      : "Image, audio and video files only"
                 : "Add Files";
             }}
             styles={{

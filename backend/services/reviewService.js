@@ -1,139 +1,152 @@
 import DBConnection from "../config/db.js";
-import aws from "aws-sdk";
-import { v4 as uuidv4 } from "uuid";
-
-aws.config.update({
-    signatureVersion: "v4",
-    region: "ap-south-1",
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
-});
-
-let getSignedURL = (filetype) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            var s3 = new aws.S3();
-            let filename = uuidv4();
-
-            var params = {
-                Bucket: 'reviewsystemmultimedia',
-                Key: filename,
-                Expires: 60,
-                ContentType: filetype
-            };
-
-            s3.getSignedUrl('putObject', params, function (err, data) {
-                if (err) {
-                    console.log(err);
-                    throw (err);
-                }
-                else {
-                    resolve({ filename, 'url': data });
-                }
-            });
-        } catch (err) {
-            reject(err);
-        }
-    });
-};
-
-let addMultimedia = (data, type, id) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let media = {
-                mediaID: uuidv4(),
-                mediaref: data.name,
-                reviewID: id,
-                type: type,
-                caption: data.caption,
-            };
-            DBConnection.query(
-                ' INSERT INTO multimedia set ? ', media,
-                function (err, rows) {
-                    if (err) {
-                        throw (err);
-                    }
-                    resolve("added");
-                }
-            );
-        } catch (err) {
-            reject(err);
-        }
-    });
-};
+import { nanoid } from 'nanoid';
+import encryptionService from "./encryptionService.js";
+import axios from "axios";
+import anchor from "@project-serum/anchor";
+import { program, provider } from "../config/solana/main.js";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils/index.js";
+import BN from 'bn.js';
+const { SystemProgram } = anchor.web3;
 
 let addReview = (review, id) => {
     return new Promise(async (resolve, reject) => {
         try {
             let newReview = {
-                reviewID: uuidv4(),
                 text: review.text,
                 rating: review.rating,
+                images: review.images,
+                videos: review.videos,
+                audios: review.audios,
                 time: new Date().toISOString(),
-                author: id,
-                org: review.org,
             };
-            DBConnection.query(
-                ' INSERT INTO review set ? ', newReview,
-                async function (err, rows) {
-                    if (err) {
-                        throw (err);
-                    }
-                    for (const image of review.images) {
-                        await addMultimedia(image, "image", newReview.reviewID);
-                    }
-                    for (const video of review.videos) {
-                        await addMultimedia(video, "video", newReview.reviewID);
-                    }
-                    for (const audio of review.audios) {
-                        await addMultimedia(audio, "audio", newReview.reviewID);
-                    }
-                    resolve("added review");
-                }
+            const encrypted_org_id = encryptionService.encrypt(review.org);
+            const orgSeeds = [Buffer.from("organization"), Buffer.from(encrypted_org_id)];
+            const [orgAccount, _orgBump] = publicKey.findProgramAddressSync(
+                orgSeeds,
+                program._programId
             );
+
+            let orgData = await program.account.organization.fetch(orgAccount);
+
+            const encrypted_user_id = encryptionService.encrypt(id);
+            const userSeeds = [Buffer.from("user"), Buffer.from(encrypted_user_id)];
+            const [userAccount, _userBump] = publicKey.findProgramAddressSync(
+                userSeeds,
+                program._programId
+            );
+
+            let userData = await program.account.user.fetch(userAccount);
+
+            const reviewSeeds = [
+                Buffer.from("review"),
+                orgAccount.toBuffer(),
+                orgData.reviewCount.toArrayLike(Buffer),
+            ];
+
+            const userReviewSeeds = [
+                Buffer.from("user_review"),
+                userAccount.toBuffer(),
+                userData.reviewCount.toArrayLike(Buffer),
+            ];
+
+            const [reviewAccount, _reviewBump] = publicKey.findProgramAddressSync(
+                reviewSeeds,
+                program._programId
+            );
+
+            const [userReviewAccount, _userReviewBump] =
+                publicKey.findProgramAddressSync(userReviewSeeds, program._programId);
+
+            await program.rpc.createReview(encrypted_org_id, encrypted_user_id, newReview, {
+                accounts: {
+                    orgAccount: orgAccount,
+                    userAccount: userAccount,
+                    reviewAccount: reviewAccount,
+                    userReviewAccount: userReviewAccount,
+                    user: provider.wallet.publicKey,
+                    systemProgram: SystemProgram.programId,
+                },
+            });
+            resolve("added review");
         } catch (err) {
             reject(err);
         }
     });
 };
 
-let getMultimedia = (id) => {
+let prepareReview = (reviewData, withOrg) => {
     return new Promise(async (resolve, reject) => {
         try {
-            DBConnection.query(
-                ' SELECT * from multimedia WHERE reviewID = ? ', id,
-                async function (err, rows) {
-                    if (err) {
+            let outputReview = {
+                rating: reviewData.rating,
+                time: reviewData.time,
+                images: [],
+                videos: [],
+                audios: [],
+            };
+            let textUrl = process.env.IPFS_URL.concat(reviewData.text);
+            await axios.get(textUrl)
+                .then((response) => {
+                    outputReview.text = response.data;
+                })
+                .catch((err) => {
+                    throw (err);
+                });
+            for (let image of reviewData.images) {
+                let url = process.env.IPFS_URL.concat(image.mediaref);
+                let captionUrl = process.env.IPFS_URL.concat(image.caption);
+                await axios.get(captionUrl)
+                    .then((response) => {
+                        image.caption = response.data;
+                    })
+                    .catch((err) => {
                         throw (err);
-                    }
-                    let multimedia = [...rows];
-                    let output = {
-                        'images': [],
-                        'videos': [],
-                        'audios': []
-                    };
-                    multimedia.forEach((media) => {
-                        let url = process.env.AWS_S3_URL.concat(media.mediaref);
-                        switch (media.type) {
-                            case 'image': {
-                                output.images.push({ 'url': url, 'caption': media.caption });
-                                break;
-                            }
-                            case 'audio': {
-                                output.audios.push({ 'url': url, 'caption': media.caption });
-                                break;
-                            }
-                            case 'video': {
-                                output.videos.push({ 'url': url, 'caption': media.caption });
-                                break;
-                            }
-                            default:
-                                break;
-                        }
                     });
-                    resolve(output);
-                }
-            );
+                outputReview.images.push({ 'url': url, 'caption': image.caption });
+            }
+            for (let video of reviewData.videos) {
+                let url = process.env.IPFS_URL.concat(video.mediaref);
+                let captionUrl = process.env.IPFS_URL.concat(video.caption);
+                await axios.get(captionUrl)
+                    .then((response) => {
+                        video.caption = response.data;
+                    })
+                    .catch((err) => {
+                        throw (err);
+                    });
+                outputReview.videos.push({ 'url': url, 'caption': video.caption });
+            }
+            for (let audio of reviewData.audios) {
+                let url = process.env.IPFS_URL.concat(audio.mediaref);
+                let captionUrl = process.env.IPFS_URL.concat(audio.caption);
+                await axios.get(captionUrl)
+                    .then((response) => {
+                        audio.caption = response.data;
+                    })
+                    .catch((err) => {
+                        throw (err);
+                    });
+                outputReview.audios.push({ 'url': url, 'caption': audio.caption });
+            }
+            if (withOrg) {
+                DBConnection.query(
+                    ' SELECT * FROM `Organization` WHERE `orgID` = ?  ', encryptionService.decrypt(reviewData.organization),
+                    async function (err, rows) {
+                        if (err) {
+                            throw (err);
+                        }
+                        if (rows.length > 0) {
+                            resolve({ ...outputReview, ...rows[0] });
+                        }
+                        else {
+                            throw ("Error finding Organization.");
+                        }
+                    }
+                );
+            }
+            else {
+                resolve(outputReview);
+            }
         } catch (err) {
             reject(err);
         }
@@ -143,33 +156,57 @@ let getMultimedia = (id) => {
 let getReviews = (id, type) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let query = {};
-            let table = "";
+            let output = [];
             if (type == "user") {
-                table = "review JOIN Organization ON review.org = Organization.orgID";
-                query = { 'author': id };
+                const encrypted_user_id = encryptionService.encrypt(id);
+                const userSeeds = [Buffer.from("user"), Buffer.from(encrypted_user_id)];
+                const [userAccount, _userBump] = publicKey.findProgramAddressSync(
+                    userSeeds,
+                    program._programId
+                );
+                let userData = await program.account.user.fetch(userAccount);
+                let reviewCount = userData.reviewCount;
+                for (let i = 0; i < reviewCount; i++) {
+                    const userReviewSeeds = [
+                        Buffer.from("user_review"),
+                        userAccount.toBuffer(),
+                        new BN(i).toArrayLike(Buffer),
+                    ];
+                    const [userReviewAccount, _userReviewBump] =
+                        publicKey.findProgramAddressSync(userReviewSeeds, program._programId);
+                    const userReviewData = await program.account.userReview.fetch(
+                        userReviewAccount
+                    );
+                    const reviewData = await program.account.review.fetch(userReviewData.review);
+                    let newReview = await prepareReview(reviewData, true);
+                    output.push(newReview);
+                }
             }
             else if (type == "org") {
-                table = "review";
-                query = { 'org': id };
-            }
-            let reviews = [];
-            DBConnection.query(
-                ` SELECT * FROM ${table} WHERE ? `, query,
-                async function (err, rows) {
-                    if (err) {
-                        throw (err);
-                    }
-                    // console.log(rows);
-                    reviews = [...rows];
-                    let output = [];
-                    for (let review of reviews) {
-                        let multimedia = await getMultimedia(review.reviewID);
-                        output.push({ ...review, ...multimedia });
-                    }
-                    resolve(output);
+                const encrypted_org_id = encryptionService.encrypt(id);
+                const orgSeeds = [Buffer.from("organization"), Buffer.from(encrypted_org_id)];
+                const [orgAccount, _orgBump] = publicKey.findProgramAddressSync(
+                    orgSeeds,
+                    program._programId
+                );
+                let orgData = await program.account.organization.fetch(orgAccount);
+                let reviewCount = orgData.reviewCount;
+                for (let i = 0; i < reviewCount; i++) {
+                    const reviewSeeds = [
+                        Buffer.from("review"),
+                        orgAccount.toBuffer(),
+                        new BN(i).toArrayLike(Buffer),
+                    ];
+                    const [reviewAccount, _reviewBump] = publicKey.findProgramAddressSync(
+                        reviewSeeds,
+                        program._programId
+                    );
+                    const reviewData = await program.account.review.fetch(reviewAccount);
+                    let newReview = await prepareReview(reviewData, false);
+                    output.push(newReview);
                 }
-            );
+            }
+            resolve(output);
         } catch (err) {
             reject(err);
         }
@@ -177,7 +214,6 @@ let getReviews = (id, type) => {
 };
 
 export default {
-    getSignedURL: getSignedURL,
     addReview: addReview,
     getReviews: getReviews,
 };

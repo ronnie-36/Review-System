@@ -1,6 +1,11 @@
 import DBConnection from "../config/db.js";
+import anchor from "@project-serum/anchor";
+import encryptionService from "./encryptionService.js"
+import { program, provider } from "../config/solana/main.js";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils/index.js";
+const { SystemProgram } = anchor.web3;
 
-let createNewUser = (data) => {
+let createNewUser = (data, createOnBlockchain = false) => {
     return new Promise(async (resolve, reject) => {
         try {
             // check email is exist or not
@@ -12,9 +17,12 @@ let createNewUser = (data) => {
                 //create a new account
                 DBConnection.query(
                     ' INSERT INTO users set ? ', data,
-                    function (err, rows) {
+                    async function (err, rows) {
                         if (err) {
                             throw (err);
+                        }
+                        if (createOnBlockchain) {
+                            await createUserOnBlockchain(data.id);
                         }
                         resolve(data);
                     }
@@ -26,14 +34,17 @@ let createNewUser = (data) => {
     });
 };
 
-let update = (data, id) => {
+let update = (data, id, createOnBlockchain = false) => {
     return new Promise(async (resolve, reject) => {
         try {
             DBConnection.query(
                 ' UPDATE users SET ? WHERE `id` = ?', [data, id],
-                function (err, rows) {
+                async function (err, rows) {
                     if (err) {
                         throw (err);
+                    }
+                    if (createOnBlockchain) {
+                        await createUserOnBlockchain(id);
                     }
                     resolve("Update successful");
                 }
@@ -109,6 +120,30 @@ let checkExistPhone = (phone) => {
     });
 };
 
+let createUserOnBlockchain = (user_id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const encrypted_user_id = encryptionService.encrypt(user_id);
+            const seeds = [Buffer.from("user"), Buffer.from(encrypted_user_id)];
+            const [userAccount, _bump] = publicKey.findProgramAddressSync(
+                seeds,
+                program._programId
+            );
+
+            await program.rpc.createUser(encrypted_user_id, {
+                accounts: {
+                    userAccount: userAccount,
+                    user: provider.wallet.publicKey,
+                    systemProgram: SystemProgram.programId,
+                },
+            });
+
+            resolve("Created user on Blockchain.");
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 export default {
     createNewUser: createNewUser,
     update: update,

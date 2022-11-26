@@ -1,5 +1,11 @@
 import DBConnection from "../config/db.js";
+import { nanoid } from 'nanoid';
 import axios from "axios";
+import anchor from "@project-serum/anchor";
+import encryptionService from "./encryptionService.js";
+import { program, provider } from "../config/solana/main.js";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils/index.js";
+const { SystemProgram } = anchor.web3;
 
 let addOrg = (place_id) => {
     return new Promise(async (resolve, reject) => {
@@ -13,8 +19,10 @@ let addOrg = (place_id) => {
             let placeDetails = response.data;
             // console.log(placeDetails);
             if (placeDetails.status == "OK") {
+                const org_id = nanoid();
                 let newOrg = {
-                    orgID: place_id,
+                    orgID: org_id,
+                    placeID: place_id,
                     name: placeDetails.result.name,
                     loc_lat: placeDetails.result.geometry.location.lat,
                     loc_long: placeDetails.result.geometry.location.lng,
@@ -24,10 +32,23 @@ let addOrg = (place_id) => {
                 }
                 DBConnection.query(
                     ' INSERT INTO Organization set ? ', newOrg,
-                    function (err, rows) {
+                    async function (err, rows) {
                         if (err) {
                             throw (err);
                         }
+                        const encrypted_org_id = encryptionService.encrypt(org_id);
+                        const seeds = [Buffer.from("organization"), Buffer.from(encrypted_org_id)];
+                        const [orgAccount, _bump] = publicKey.findProgramAddressSync(
+                            seeds,
+                            program._programId
+                        );
+                        await program.rpc.createOrganization(encrypted_org_id, {
+                            accounts: {
+                                orgAccount: orgAccount,
+                                user: provider.wallet.publicKey,
+                                systemProgram: SystemProgram.programId,
+                            },
+                        });
                         resolve(newOrg);
                     }
                 );

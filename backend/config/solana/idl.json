@@ -1,0 +1,307 @@
+{
+  "version": "0.1.0",
+  "name": "reviewsystem",
+  "instructions": [
+    {
+      "name": "createOrganization",
+      "accounts": [
+        {
+          "name": "orgAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "organizationId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createUser",
+      "accounts": [
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "userId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createReview",
+      "accounts": [
+        {
+          "name": "orgAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reviewAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userReviewAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "organizationId",
+          "type": "string"
+        },
+        {
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "name": "review",
+          "type": {
+            "defined": "NewReview"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Organization",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reviewCount",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reviewCount",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserReview",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "review",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Review",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "text",
+            "type": "string"
+          },
+          {
+            "name": "rating",
+            "type": "u8"
+          },
+          {
+            "name": "time",
+            "type": "string"
+          },
+          {
+            "name": "images",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "videos",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "audios",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "organization",
+            "type": "string"
+          },
+          {
+            "name": "user",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "MultimediaStruct",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mediaref",
+            "type": "string"
+          },
+          {
+            "name": "caption",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewReview",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "text",
+            "type": "string"
+          },
+          {
+            "name": "rating",
+            "type": "u8"
+          },
+          {
+            "name": "time",
+            "type": "string"
+          },
+          {
+            "name": "images",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "videos",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          },
+          {
+            "name": "audios",
+            "type": {
+              "vec": {
+                "defined": "MultimediaStruct"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "MaxImageLimitReached",
+      "msg": "Maximum 5 images can be attached"
+    },
+    {
+      "code": 6001,
+      "name": "MaxVideoLimitReached",
+      "msg": "Maximum 5 videos can be attached"
+    },
+    {
+      "code": 6002,
+      "name": "MaxAudioLimitReached",
+      "msg": "Maximum 5 audios can be attached"
+    },
+    {
+      "code": 6003,
+      "name": "MaxOrganizationReviewLimitReached",
+      "msg": "Maximum Review Limit Reached for organization"
+    },
+    {
+      "code": 6004,
+      "name": "MaxUserReviewLimitReached",
+      "msg": "Maximum Review Limit Reached for user"
+    }
+  ],
+  "metadata": {
+    "address": "Cfzj3oJn8E5vdmEThrb1s8c7M5FE6m9fRnNky8i98TZb"
+  }
+}
