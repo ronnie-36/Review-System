@@ -1,170 +1,170 @@
 {
   "version": "0.1.0",
-    "name": "mysolanaapp",
-      "instructions": [
+  "name": "reviewsystem",
+  "instructions": [
+    {
+      "name": "createOrganization",
+      "accounts": [
         {
-          "name": "createOrganization",
-          "accounts": [
-            {
-              "name": "orgAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "user",
-              "isMut": true,
-              "isSigner": true
-            },
-            {
-              "name": "systemProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ],
-          "args": [
-            {
-              "name": "organizationId",
-              "type": "string"
-            }
-          ]
+          "name": "orgAccount",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "createUser",
-          "accounts": [
-            {
-              "name": "userAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "user",
-              "isMut": true,
-              "isSigner": true
-            },
-            {
-              "name": "systemProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ],
-          "args": [
-            {
-              "name": "userId",
-              "type": "string"
-            }
-          ]
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          "name": "createReview",
-          "accounts": [
-            {
-              "name": "orgAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "userAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "reviewAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "userReviewAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "user",
-              "isMut": true,
-              "isSigner": true
-            },
-            {
-              "name": "systemProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ],
-          "args": [
-            {
-              "name": "organizationId",
-              "type": "string"
-            },
-            {
-              "name": "userId",
-              "type": "string"
-            },
-            {
-              "name": "review",
-              "type": {
-                "defined": "NewReview"
-              }
-            }
-          ]
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-        "accounts": [
+      "args": [
+        {
+          "name": "organizationId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createUser",
+      "accounts": [
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "userId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createReview",
+      "accounts": [
+        {
+          "name": "orgAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reviewAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userReviewAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "organizationId",
+          "type": "string"
+        },
+        {
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "name": "review",
+          "type": {
+            "defined": "NewReview"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Organization",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            "name": "Organization",
-            "type": {
-              "kind": "struct",
-              "fields": [
-                {
-                  "name": "reviewCount",
-                  "type": "u64"
-                },
-                {
-                  "name": "bump",
-                  "type": "u8"
-                }
-              ]
-            }
+            "name": "reviewCount",
+            "type": "u64"
           },
           {
-            "name": "User",
-            "type": {
-              "kind": "struct",
-              "fields": [
-                {
-                  "name": "reviewCount",
-                  "type": "u64"
-                },
-                {
-                  "name": "bump",
-                  "type": "u8"
-                }
-              ]
-            }
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "reviewCount",
+            "type": "u64"
           },
           {
-            "name": "UserReview",
-            "type": {
-              "kind": "struct",
-              "fields": [
-                {
-                  "name": "review",
-                  "type": "publicKey"
-                },
-                {
-                  "name": "bump",
-                  "type": "u8"
-                }
-              ]
-            }
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserReview",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "review",
+            "type": "publicKey"
           },
           {
-            "name": "Review",
-            "type": {
-              "kind": "struct",
-              "fields": [
-                {
-                  "name": "text",
-                  "type": "string"
-                },
-                {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Review",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "text",
+            "type": "string"
+          },
+          {
             "name": "rating",
             "type": "u8"
           },
@@ -300,5 +300,8 @@
       "name": "MaxUserReviewLimitReached",
       "msg": "Maximum Review Limit Reached for user"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "Cfzj3oJn8E5vdmEThrb1s8c7M5FE6m9fRnNky8i98TZb"
+  }
 }
