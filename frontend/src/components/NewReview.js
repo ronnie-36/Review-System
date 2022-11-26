@@ -7,7 +7,7 @@ import PreviewMedia from "./PreviewMedia";
 import { postReview, getIPFSclient } from "../apiHelpers/review";
 import { toast } from "react-toastify";
 
-function NewReview({ org, setAddSection }) {
+function NewReview({ org, setAddSection, getReveiws }) {
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
@@ -55,6 +55,7 @@ function NewReview({ org, setAddSection }) {
       audios: [],
     };
 
+    //image upload section for reviews
     for (const image of newReview.images) {
       if (ipfs) {
         const fileResult = await ipfs.add(image.file);
@@ -73,6 +74,7 @@ function NewReview({ org, setAddSection }) {
       }
     }
 
+    //video upload
     for (const video of newReview.videos) {
       if (ipfs) {
         const fileResult = await ipfs.add(video.file);
@@ -91,6 +93,7 @@ function NewReview({ org, setAddSection }) {
       }
     }
 
+    //audio upload
     for (const audio of newReview.audios) {
       if (ipfs) {
         const fileResult = await ipfs.add(audio.file);
@@ -121,9 +124,11 @@ function NewReview({ org, setAddSection }) {
       });
       toast.success("Review added successfully");
       setAddSection(false);
+      getReveiws();
     } else {
       toast.error("unable to add the review");
     }
+
     setAddReviewLoading(false);
   };
 
