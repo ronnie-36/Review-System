@@ -66,7 +66,7 @@ let checkExistOrg = (orgID) => {
     return new Promise((resolve, reject) => {
         try {
             DBConnection.query(
-                ' SELECT * FROM `Organization` WHERE `orgID` = ?  ', orgID,
+                ' SELECT * FROM `Organization` WHERE `placeID` = ?  ', orgID,
                 function (err, rows) {
                     if (err) {
                         throw (err);
