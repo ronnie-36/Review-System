@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Pagination, PaginationItem, PaginationLink } from "reactstrap";
+import { Pagination, PaginationItem, PaginationLink, Spinner } from "reactstrap";
 
 import Review from "../components/Review";
 
@@ -26,7 +26,7 @@ function UserDetails({ logged, setLogged, userID }) {
   // const [emailClearTimer, setEmailClearTimer] = useState(null);
 
   const [reviews, setReviews] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
   const pageSize = 5;
@@ -36,6 +36,7 @@ function UserDetails({ logged, setLogged, userID }) {
       navigate("/");
     } else {
       (async function () {
+        setIsLoading(true);
         const response = await fetchReviewsByUser();
         if (response.status === "success") {
           console.log(response.reviews);
@@ -44,6 +45,7 @@ function UserDetails({ logged, setLogged, userID }) {
         } else {
           toast.error("Unable to fetch reviews");
         }
+        setIsLoading(false);
       })();
     }
 
@@ -273,11 +275,13 @@ function UserDetails({ logged, setLogged, userID }) {
 
           <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
             <div className="fw-bold align-self-center">My Reviews</div>
-            {reviews
-              .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-              .map((value) => {
-                return <Review key={value.reviewID} review={value} />;
-              })}
+
+            {isLoading ? <Spinner>Loading...</Spinner> :
+              reviews
+                .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                .map((value) => {
+                  return <Review key={value.reviewID} review={value} />;
+                })}
           </div>
           {reviews.length !== 0 && (
             <Pagination
