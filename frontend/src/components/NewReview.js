@@ -7,7 +7,7 @@ import PreviewMedia from "./PreviewMedia";
 import { postReview, getIPFSclient } from "../apiHelpers/review";
 import { toast } from "react-toastify";
 
-function NewReview({ org, setAddSection, getReveiws }) {
+function NewReview({ org, setAddSection, reviews, setReviews }) {
   const [newReview, setNewReview] = useState({
     rating: 0,
     text: "",
@@ -55,6 +55,16 @@ function NewReview({ org, setAddSection, getReveiws }) {
       audios: [],
     };
 
+    let dummyReview = {
+      text: newReview.text,
+      rating: newReview.rating,
+      org: org.orgID,
+      time: new Date().toISOString(),
+      images: [], //{url:"",caption:""}
+      videos: [],
+      audios: [],
+    };
+
     //image upload section for reviews
     for (const image of newReview.images) {
       if (ipfs) {
@@ -62,6 +72,10 @@ function NewReview({ org, setAddSection, getReveiws }) {
         const captionResult = await ipfs.add(image.caption);
         if (fileResult && captionResult) {
           review.images.push({ mediaref: fileResult.path, caption: captionResult.path });
+          dummyReview.images.push({
+            url: process.env.REACT_APP_IPFS_URL.concat(fileResult.path),
+            caption: image.caption
+          });
         } else {
           toast.error("Unable to upload images");
           setAddReviewLoading(false);
@@ -81,6 +95,10 @@ function NewReview({ org, setAddSection, getReveiws }) {
         const captionResult = await ipfs.add(video.caption);
         if (fileResult && captionResult) {
           review.videos.push({ mediaref: fileResult.path, caption: captionResult.path });
+          dummyReview.videos.push({
+            url: process.env.REACT_APP_IPFS_URL.concat(fileResult.path),
+            caption: video.caption
+          });
         } else {
           toast.error("Unable to upload videos");
           setAddReviewLoading(false);
@@ -100,6 +118,10 @@ function NewReview({ org, setAddSection, getReveiws }) {
         const captionResult = await ipfs.add(audio.caption);
         if (fileResult && captionResult) {
           review.audios.push({ mediaref: fileResult.path, caption: captionResult.path });
+          dummyReview.audios.push({
+            url: process.env.REACT_APP_IPFS_URL.concat(fileResult.path),
+            caption: audio.caption
+          });
         } else {
           toast.error("Unable to upload audios");
           setAddReviewLoading(false);
@@ -115,6 +137,7 @@ function NewReview({ org, setAddSection, getReveiws }) {
     const response = await postReview(review);
 
     if (response.status === "success") {
+      await setReviews([...reviews, dummyReview]);
       setNewReview({
         rating: 0,
         text: "",
@@ -124,7 +147,6 @@ function NewReview({ org, setAddSection, getReveiws }) {
       });
       toast.success("Review added successfully");
       setAddSection(false);
-      getReveiws();
     } else {
       toast.error("unable to add the review");
     }

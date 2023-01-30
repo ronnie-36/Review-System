@@ -40,21 +40,21 @@ function OrgView({ logged, setLogged, userID, org }) {
     []
   );
 
-  const getReviews = async () => {
-    const response = await fetchReviewsByOrg(org.orgID);
-    if (response.status === "success") {
-      setReviews(response.reviews);
-      setPageCount(Math.ceil(response.reviews.length / pageSize));
-      if (response.reviews.length !== 0) {
-        setavgRating(
-          Math.round((response.reviews.reduce((total, review) => total + review.rating, 0) /
-            response.reviews.length) * 100) / 100
-        );
-      }
-    } else {
-      toast.error("Unable to fetch reviews");
-    }
-  };
+  // const getReviews = async () => {
+  //   const response = await fetchReviewsByOrg(org.orgID);
+  //   if (response.status === "success") {
+  //     setReviews(response.reviews);
+  //     setPageCount(Math.ceil(response.reviews.length / pageSize));
+  //     if (response.reviews.length !== 0) {
+  //       setavgRating(
+  //         Math.round((response.reviews.reduce((total, review) => total + review.rating, 0) /
+  //           response.reviews.length) * 100) / 100
+  //       );
+  //     }
+  //   } else {
+  //     toast.error("Unable to fetch reviews");
+  //   }
+  // };
 
   useEffect(() => {
     if (org === null) {
@@ -204,7 +204,8 @@ function OrgView({ logged, setLogged, userID, org }) {
             org={org}
             userID={userID}
             setAddSection={setAddSection}
-            getReveiws={getReviews}
+            reviews={reviews}
+            setReviews={setReviews}
           />
         ) : (
           <div>Please Log in first to add a review</div>
