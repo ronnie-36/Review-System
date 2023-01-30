@@ -39,11 +39,11 @@ function PreviewMedia({
   useEffect(() => {
     function getValue() {
       if (imagePattern.test(type)) {
-        return newReview.images.find((image) => image.id === id).caption;
+        return newReview.images.find((image) => image.id === id)?.caption;
       } else if (videoPattern.test(type)) {
-        return newReview.videos.find((video) => video.id === id).caption;
+        return newReview.videos.find((video) => video.id === id)?.caption;
       } else if (audioPattern.test(type)) {
-        return newReview.audios.find((audio) => audio.id === id).caption;
+        return newReview.audios.find((audio) => audio.id === id)?.caption;
       }
     }
 

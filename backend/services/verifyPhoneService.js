@@ -5,7 +5,7 @@ let sendOTP = (phone) => {
         try {
             client.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE)
                 .verifications
-                .create({ to: phone, channel: 'whatsapp' })
+                .create({ to: phone, channel: process.env.TWILIO_CHANNEL })
                 .then(verification => resolve(verification));
         } catch (err) {
             reject(err);

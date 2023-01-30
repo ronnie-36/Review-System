@@ -47,8 +47,8 @@ function OrgView({ logged, setLogged, userID, org }) {
       setPageCount(Math.ceil(response.reviews.length / pageSize));
       if (response.reviews.length !== 0) {
         setavgRating(
-          response.reviews.reduce((total, review) => total + review.rating, 0) /
-            response.reviews.length
+          Math.round((response.reviews.reduce((total, review) => total + review.rating, 0) /
+            response.reviews.length) * 100) / 100
         );
       }
     } else {
@@ -69,10 +69,8 @@ function OrgView({ logged, setLogged, userID, org }) {
           setPageCount(Math.ceil(response.reviews.length / pageSize));
           if (response.reviews.length !== 0) {
             setavgRating(
-              response.reviews.reduce(
-                (total, review) => total + review.rating,
-                0
-              ) / response.reviews.length
+              Math.round((response.reviews.reduce((total, review) => total + review.rating, 0) /
+                response.reviews.length) * 100) / 100
             );
           }
         } else {

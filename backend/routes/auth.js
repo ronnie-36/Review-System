@@ -32,7 +32,11 @@ router.get(
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    res.cookie("jwt", token);
+    res.cookie("jwt", token, {
+      domain: process.env.DOMAIN,
+      // secure: true,
+      // sameSite: 'none',
+    });
     if (req.user.phone == "") {
       res.redirect(`${process.env.FRONTEND_LINK}/addphone`);
     }
@@ -118,7 +122,11 @@ router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next)
           process.env.JWT_SECRET,
           { expiresIn: "1h" }
         );
-        res.cookie("jwt", token);
+        res.cookie("jwt", token, {
+          domain: process.env.DOMAIN,
+          // secure: true,
+          // sameSite: 'none',
+        });
       }
       else {
         let existUser = await registerService.checkExistPhone(phone);
@@ -153,7 +161,11 @@ router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next)
               process.env.JWT_SECRET,
               { expiresIn: "1h" }
             );
-            res.cookie("jwt", token);
+            res.cookie("jwt", token, {
+              domain: process.env.DOMAIN,
+              // secure: true,
+              // sameSite: 'none',
+            });
           }
         }
         else {
@@ -186,7 +198,9 @@ router.post("/phone/verifyOTP", optionalJwtAuth, async function (req, res, next)
 // @desc    Logout user
 // @route   /auth/logout
 router.get("/logout", (req, res, next) => {
-  res.clearCookie("jwt");
+  res.clearCookie("jwt", {
+    domain: process.env.DOMAIN,
+  });
   res.status(200);
   res.json({ status: "success", message: "Logged Out successfully" });
   return res.end();
