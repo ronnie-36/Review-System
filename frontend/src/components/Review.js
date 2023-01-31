@@ -57,56 +57,56 @@ function Review({ review }) {
       <div>{parseTime(review.time)}</div>
       <div className="">{review.text}</div>
 
-      {review.images.length + review.videos.length + review.audios.length !==
+      {index !== null && review.images.length + review.videos.length + review.audios.length !==
         0 && (
-        <>
-          <div
-            style={{ height: "13rem" }}
-            className="d-flex justify-content-between align-items-center"
-          >
-            <BsFillArrowLeftCircleFill
-              style={{ cursor: "pointer" }}
-              onClick={getPrevMedia}
-            />
-            {index < review.images.length ? (
-              <ModalImage image={review.images[index]} />
-            ) : index < review.images.length + review.videos.length ? (
-              <ModalVideo video={review.videos[index - review.images.length]} />
-            ) : (
-              index <
+          <>
+            <div
+              style={{ height: "13rem" }}
+              className="d-flex justify-content-between align-items-center"
+            >
+              <BsFillArrowLeftCircleFill
+                style={{ cursor: "pointer" }}
+                onClick={getPrevMedia}
+              />
+              {index < review.images.length ? (
+                <ModalImage image={review.images[index]} />
+              ) : index < review.images.length + review.videos.length ? (
+                <ModalVideo video={review.videos[index - review.images.length]} />
+              ) : (
+                index <
                 review.images.length +
-                  review.videos.length +
-                  review.audios.length && (
-                <div
-                  className="mw-100 p-1 d-flex flex-column justify-content-center"
-                  style={{ height: "9rem" }}
-                >
-                  <audio className="mw-100" controls>
-                    <source
-                      src={
+                review.videos.length +
+                review.audios.length && (
+                  <div
+                    className="mw-100 p-1 d-flex flex-column justify-content-center"
+                    style={{ height: "9rem" }}
+                  >
+                    <audio className="mw-100" controls>
+                      <source
+                        src={
+                          review.audios[
+                            index - review.images.length - review.videos.length
+                          ].url
+                        }
+                      />
+                    </audio>
+                    <p style={{ textAlign: "center" }}>
+                      {
                         review.audios[
                           index - review.images.length - review.videos.length
-                        ].url
+                        ].caption
                       }
-                    />
-                  </audio>
-                  <p style={{ textAlign: "center" }}>
-                    {
-                      review.audios[
-                        index - review.images.length - review.videos.length
-                      ].caption
-                    }
-                  </p>
-                </div>
-              )
-            )}
-            <BsFillArrowRightCircleFill
-              style={{ cursor: "pointer" }}
-              onClick={getNextMedia}
-            />
-          </div>
-        </>
-      )}
+                    </p>
+                  </div>
+                )
+              )}
+              <BsFillArrowRightCircleFill
+                style={{ cursor: "pointer" }}
+                onClick={getNextMedia}
+              />
+            </div>
+          </>
+        )}
     </div>
   );
 }

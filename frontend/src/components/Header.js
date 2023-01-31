@@ -26,7 +26,7 @@ function Header({ logged, setLogged }) {
       className="navbar__homepage"
     >
       <NavbarBrand href="/" className="me-auto">
-        Review System
+        dReview
       </NavbarBrand>
       <Nav className="ml-auto" navbar>
         <NavItem

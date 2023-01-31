@@ -89,6 +89,12 @@ function OrgView({ logged, setLogged, userID, org }) {
           });
       })();
     }
+    else if (reviews.length !== 0) {
+      setPageCount(Math.ceil(reviews.length / pageSize));
+      setavgRating(
+        Math.round((reviews.reduce((total, review) => total + review.rating, 0) / reviews.length) * 100) / 100
+      );
+    }
   }, [org, addSection, navigate, loader, reviews]);
 
   const handleClick = (e, index) => {
