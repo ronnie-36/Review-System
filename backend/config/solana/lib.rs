@@ -78,7 +78,8 @@ pub mod reviewsystem {
 pub struct CreateOrganization<'info> {
     #[account(init, payer = user, space = 8 + 8 + 1,seeds=[b"organization",_organization_id.as_bytes()],bump)]
     pub org_account: Account<'info, Organization>,
-    #[account(mut)]
+    //change public key below to admin public key
+    #[account(mut), address = Pubkey::from_str("G1wCk53xzf3MMhRWmNSMtgvuCuv2Now6qE3rHRreR9pr").unwrap()]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
@@ -88,7 +89,8 @@ pub struct CreateOrganization<'info> {
 pub struct CreateUser<'info> {
     #[account(init,payer=user,space = 8+8+1 , seeds=[b"user",_user_id.as_bytes()],bump)]
     pub user_account: Account<'info, User>,
-    #[account(mut)]
+    //change public key below to admin public key
+    #[account(mut), address = Pubkey::from_str("G1wCk53xzf3MMhRWmNSMtgvuCuv2Now6qE3rHRreR9pr").unwrap()]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
@@ -105,7 +107,8 @@ pub struct AddReview<'info> {
     pub review_account: Account<'info, Review>,
     #[account(init,payer=user,space=8+32+1,seeds=[b"user_review",user_account.key().as_ref(),&[user_account.review_count as u8]],bump)]
     pub user_review_account: Account<'info, UserReview>,
-    #[account(mut)]
+    //change public key below to admin public key
+    #[account(mut), address = Pubkey::from_str("G1wCk53xzf3MMhRWmNSMtgvuCuv2Now6qE3rHRreR9pr").unwrap()]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
