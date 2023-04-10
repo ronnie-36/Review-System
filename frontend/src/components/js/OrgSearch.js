@@ -33,6 +33,11 @@ export default function initMap(google, setPlaceID) {
     streetViewControl: false,
     fullscreenControl: false,
   });
+  let mainMarker = null;
+  mainMarker = new google.maps.Marker({
+    position: { lat: 22.520657021229354, lng: 75.92093767747048 },
+    map,
+  });
 
   const input = document.getElementById("pac-input");
   const button = document.getElementById("submitPlace");
@@ -57,7 +62,6 @@ export default function initMap(google, setPlaceID) {
   function callback(results, status) {
     markers.forEach((marker) => marker.setMap(null));
     markers = [];
-    // console.log(results);
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       results.forEach((result) => {
         const image = {
@@ -67,7 +71,6 @@ export default function initMap(google, setPlaceID) {
           anchor: new google.maps.Point(17, 34),
           scaledSize: new google.maps.Size(25, 25),
         };
-        //console.log(result);
         let marker = new google.maps.Marker({
           icon: image,
           position: result.geometry.location,
@@ -77,7 +80,6 @@ export default function initMap(google, setPlaceID) {
         marker.setVisible(true);
 
         marker.addListener("click", () => {
-          //console.log(e);
           infowindowContent.children.namedItem("place-name").textContent =
             result.name;
           if (result.plus_code) {
@@ -108,7 +110,6 @@ export default function initMap(google, setPlaceID) {
     const service = new google.maps.places.PlacesService(map);
     service.nearbySearch(request, callback);
   });
-
   if (markers.some((marker) => marker.position === map.getCenter())) {
     return;
   }
@@ -122,6 +123,7 @@ export default function initMap(google, setPlaceID) {
   service.nearbySearch(request, callback);
 
   map.addListener("click", (place) => {
+    mainMarker.setPosition(place.latLng, map);
     if (markers.some((marker) => marker.position === place.latLng)) {
       return;
     }
@@ -156,10 +158,10 @@ export default function initMap(google, setPlaceID) {
       radius: "200",
       fields: fields,
     };
-
+    mainMarker.setPosition(place.geometry.location, map);
     const service = new google.maps.places.PlacesService(map);
     service.nearbySearch(request, callback);
   });
 
-  return map;
+  return { map, mainMarker };
 }

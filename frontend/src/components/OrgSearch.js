@@ -11,6 +11,7 @@ function OrgSearch({ org, setOrg }) {
   const [placeID, setPlaceID] = useState(null);
   const [map, setMap] = useState(null);
   const [orgLoading, setOrgLoading] = useState(false);
+  const [marker, setMarker] = useState(null);
 
   const loader = useMemo(
     () =>
@@ -25,22 +26,33 @@ function OrgSearch({ org, setOrg }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (map && "geolocation" in navigator) {
+    if (map && marker && "geolocation" in navigator) {
+      console.log(marker);
       navigator.geolocation.getCurrentPosition((pos) => {
         setMap((map) => {
           map.setCenter({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
+
           map.setZoom(13);
           return map;
+        });
+        setMarker((marker) => {
+          marker.setPosition(
+            {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+            },
+            map
+          );
         });
       });
     }
 
     if (!map) {
       (async () => {
-        const tempMap = await loader
+        let tempMap = await loader
           .load()
           .then((google) => {
             return initMap(google, setPlaceID);
@@ -48,13 +60,17 @@ function OrgSearch({ org, setOrg }) {
           .catch((err) => {
             toast.warn("Unable to load map");
           });
-
-        if (tempMap) {
-          setMap(tempMap);
+        console.log(tempMap);
+        if (tempMap.map) {
+          setMap(tempMap.map);
+        }
+        if (tempMap.mainMarker) {
+          console.log(tempMap.mainMarker);
+          setMarker(tempMap.mainMarker);
         }
       })();
     }
-  }, [loader, map]);
+  }, [loader, map, marker]);
 
   const getOrganization = async () => {
     setOrgLoading(true);
