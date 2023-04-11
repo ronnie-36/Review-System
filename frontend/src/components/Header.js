@@ -26,7 +26,7 @@ function Header({ logged, setLogged }) {
       className="navbar__homepage"
     >
       <NavbarBrand href="/" className="me-auto">
-        dReview
+        AntiCor
       </NavbarBrand>
       <Nav className="ml-auto" navbar>
         <NavItem
