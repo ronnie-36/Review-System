@@ -38,7 +38,6 @@ function AddPhone() {
   async function sendForOTP() {
     setMobileFixed(true);
     const validMobile = isValidPhoneNumber(user.mobile);
-    console.log(user.mobile);
     setOTPSendLoad(true);
     if (validMobile && !OTPTimer) {
       const response = await sendOTPMobile(user.mobile);

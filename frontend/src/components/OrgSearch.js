@@ -27,7 +27,6 @@ function OrgSearch({ org, setOrg }) {
 
   useEffect(() => {
     if (map && marker && "geolocation" in navigator) {
-      console.log(marker);
       navigator.geolocation.getCurrentPosition((pos) => {
         setMap((map) => {
           map.setCenter({
@@ -60,12 +59,10 @@ function OrgSearch({ org, setOrg }) {
           .catch((err) => {
             toast.warn("Unable to load map");
           });
-        console.log(tempMap);
         if (tempMap.map) {
           setMap(tempMap.map);
         }
         if (tempMap.mainMarker) {
-          console.log(tempMap.mainMarker);
           setMarker(tempMap.mainMarker);
         }
       })();
@@ -78,7 +75,6 @@ function OrgSearch({ org, setOrg }) {
       const response = await fetchOrganization(placeID);
       if (response.status === "success") {
         setOrg(response.placeDetails);
-        //console.log(org);
         localStorage.setItem("org", JSON.stringify(response.placeDetails));
         navigate("/orgview");
       } else if (response.status === "unauthorized") {

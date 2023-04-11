@@ -34,8 +34,27 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
   const submitReview = async () => {
     setAddReviewLoading(true);
     console.log(newReview);
-    if (newReview.text.length > 200) {
+    if (
+      newReview.text.length > 200 ||
+      newReview.text < 1 ||
+      newReview.rating === 0
+    ) {
       setError(true);
+      setAddReviewLoading(false);
+
+      if (newReview.text.length > 200) {
+        toast.error("Review Text should be less than 200 characters");
+      }
+
+      if (newReview.text.length === 0) {
+        toast.error("Review text cannot be empty");
+      }
+
+      if (newReview.rating === 0) {
+        toast.error("Review rating cannot be empty");
+      }
+
+      return;
     }
 
     let ipfs = await getIPFSclient();
@@ -71,10 +90,13 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
         const fileResult = await ipfs.add(image.file);
         const captionResult = await ipfs.add(image.caption);
         if (fileResult && captionResult) {
-          review.images.push({ mediaref: fileResult.path, caption: captionResult.path });
+          review.images.push({
+            mediaref: fileResult.path,
+            caption: captionResult.path,
+          });
           dummyReview.images.push({
             url: process.env.REACT_APP_IPFS_URL.concat(fileResult.path),
-            caption: image.caption
+            caption: image.caption,
           });
         } else {
           toast.error("Unable to upload images");
@@ -94,10 +116,13 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
         const fileResult = await ipfs.add(video.file);
         const captionResult = await ipfs.add(video.caption);
         if (fileResult && captionResult) {
-          review.videos.push({ mediaref: fileResult.path, caption: captionResult.path });
+          review.videos.push({
+            mediaref: fileResult.path,
+            caption: captionResult.path,
+          });
           dummyReview.videos.push({
             url: process.env.REACT_APP_IPFS_URL.concat(fileResult.path),
-            caption: video.caption
+            caption: video.caption,
           });
         } else {
           toast.error("Unable to upload videos");
@@ -117,10 +142,13 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
         const fileResult = await ipfs.add(audio.file);
         const captionResult = await ipfs.add(audio.caption);
         if (fileResult && captionResult) {
-          review.audios.push({ mediaref: fileResult.path, caption: captionResult.path });
+          review.audios.push({
+            mediaref: fileResult.path,
+            caption: captionResult.path,
+          });
           dummyReview.audios.push({
             url: process.env.REACT_APP_IPFS_URL.concat(fileResult.path),
-            caption: audio.caption
+            caption: audio.caption,
           });
         } else {
           toast.error("Unable to upload audios");
@@ -241,9 +269,9 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
             }}
             type="textarea"
           />
-          <p className="text-danger">
+          {/* <p className="text-danger">
             {error ? "Review cannot be more than 200 characters" : ""}
-          </p>
+          </p> */}
         </FormGroup>
         <FormGroup>
           <Label className="fw-bold" for="dropzone">
@@ -259,8 +287,9 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
                 setNewReview: setNewReview,
               });
             }}
-            accept={`${checkImageValidation() ? "image/*," : ""}${checkVideoValidation() ? "video/*," : ""
-              }${checkAudioValidation() ? "audio/*" : ""}`}
+            accept={`${checkImageValidation() ? "image/*," : ""}${
+              checkVideoValidation() ? "video/*," : ""
+            }${checkAudioValidation() ? "audio/*" : ""}`}
             inputContent={(_, extra) => {
               return extra.reject
                 ? "Image, audio and video files only"
@@ -271,10 +300,10 @@ function NewReview({ org, setAddSection, reviews, setReviews }) {
                 ? /image\/\w+/.test(extra.dragged[0].type)
                   ? "Image Limit reached for the review"
                   : /video\/\w+/.test(extra.dragged[0].type)
-                    ? "Video Limit Reached"
-                    : /audio\/\w+/.test(extra.dragged[0].type)
-                      ? "Audio Limit Reached"
-                      : "Image, audio and video files only"
+                  ? "Video Limit Reached"
+                  : /audio\/\w+/.test(extra.dragged[0].type)
+                  ? "Audio Limit Reached"
+                  : "Image, audio and video files only"
                 : "Add Files";
             }}
             styles={{

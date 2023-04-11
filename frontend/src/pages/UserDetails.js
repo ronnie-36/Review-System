@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Pagination, PaginationItem, PaginationLink, Spinner } from "reactstrap";
+import {
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+  Spinner,
+} from "reactstrap";
 
 import Review from "../components/Review";
 
@@ -276,14 +281,17 @@ function UserDetails({ logged, setLogged, userID }) {
           <div className=" mt-3 reviews w-100 d-flex flex-column align-items-center">
             <div className="fw-bold align-self-center">My Reviews</div>
 
-            {isLoading ? <Spinner>Loading...</Spinner> :
+            {isLoading ? (
+              <Spinner>Loading...</Spinner>
+            ) : (
               reviews
                 .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
                 .map((value) => {
                   return <Review key={value.reviewID} review={value} />;
-                })}
+                })
+            )}
           </div>
-          {reviews.length !== 0 && (
+          {reviews.length !== 0 && pageCount > 1 && (
             <Pagination
               className="d-flex justify-content-center"
               aria-label="Page navigation example"

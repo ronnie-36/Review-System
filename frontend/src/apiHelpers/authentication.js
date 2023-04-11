@@ -38,7 +38,6 @@ export const sendOTPMobile = async (mobile) => {
   await fetch(url, options)
     .then((response) => response.json())
     .then((response) => {
-      console.log(response);
       returnValue = response;
       return response;
     })
